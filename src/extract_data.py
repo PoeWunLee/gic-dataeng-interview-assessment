@@ -1,10 +1,7 @@
 from pathlib import Path
-import pandas as pd
 from typing import Generator
 import logging
-
-#dir imports
-ROOT_DIR=Path(__file__).parent.parent.absolute()
+import pandas as pd
 from utils.file_utils import extract_csv_to_df, save_df_to_csv, generate_dir
 from utils.metadata_utils import parse_raw_details,enrich_raw_df_with_details, parse_staging_pathname
 
@@ -12,17 +9,15 @@ from utils.metadata_utils import parse_raw_details,enrich_raw_df_with_details, p
 logging.basicConfig(level=logging.INFO)
 logger=logging.getLogger(__name__)
 
-def extract_raw_to_stage(files:Generator, dest_root_path:Path, config:dict[str:str]) ->None:
+def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_config:dict[str:str])->None:
     """Extract raw CSV with metadata enrichment, then save to file system based staging"""
-    df_by_mth_dict = pd.DataFrame()
-
+    #TODO: implement better logging
     for f in files:
-        print(f)
         #1. extract csv to dataframe
         formatted_df = extract_csv_to_df(f)
 
         #2. obtain fund name and dates metadata from raw csv
-        parsed_results = parse_raw_details(f, config)
+        parsed_results = parse_raw_details(f, raw_details_config)
         fund_name = parsed_results["fund_name"]
         date_time = parsed_results["date_time"]
 
@@ -32,13 +27,7 @@ def extract_raw_to_stage(files:Generator, dest_root_path:Path, config:dict[str:s
         #4. save enriched dataframe to staging file directories by month
         date_str = enriched_df['DATETIME'].unique().strftime('%Y-%m-%d')[0]
         stage_file_dir, staged_file_name = parse_staging_pathname(dest_root_path,fund_name, date_str)
-        generate_dir(stage_file_dir)
+        generate_dir(stage_file_dir) #generate directory if does not exist
         save_df_to_csv(enriched_df, staged_file_name)
-    
-        # if date_str in df_by_mth_dict.keys():
-        #     df_by_mth_dict[date_str] = pd.concat(df_by_mth_dict[date_str], enriched_df)
-        # else:
-        #     df_by_mth_dict[date_str] = enriched_df
-    
-    return
 
+    return

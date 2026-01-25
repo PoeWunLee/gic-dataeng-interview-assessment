@@ -8,8 +8,9 @@ sys.path.append(CURRENT_FILE_DIR)
 
 from utils.file_utils import get_details_from_filename
 from src.extract_data import parse_raw_details, parse_datetime_format
-from configs.file_configs import REGEX_FUNDNAME,REGEX_DATETIME, PARSE_RAW_DETAILS_CONFIG
-
+from config.file_configs import PARSE_RAW_DETAILS_CONFIG
+REGEX_FUNDNAME = PARSE_RAW_DETAILS_CONFIG["fund_name"]
+REGEX_DATETIME = PARSE_RAW_DETAILS_CONFIG["date_time"]
 
 @pytest.mark.parametrize(
     "input_filename, input_regex,input_tag,output",
