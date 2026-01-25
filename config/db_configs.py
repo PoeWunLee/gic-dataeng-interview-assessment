@@ -1,0 +1,5 @@
+DB_HOST="gic.db"
+DB_NAME=""
+DB_USER=""
+DB_PWD=""
+DB_PORT=""
