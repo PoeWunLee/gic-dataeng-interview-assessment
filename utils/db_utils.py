@@ -11,11 +11,7 @@ logging.getLogger(__name__)
 
 @contextmanager
 def init_db_connect(cnxn_str:str)->Generator[Connection, None, None]:
-    """
-    Initialise database connection and cursor to local sqlite3
-    Ensure clean commits and rollback. 
-    Creates db if not yet exists.
-    """
+    """Initialise database connection and cursor to local sqlite3. Creates db if not yet exists."""
     conn=None
     try:
         conn = sqlite3.connect(cnxn_str)
@@ -31,10 +27,7 @@ def init_db_connect(cnxn_str:str)->Generator[Connection, None, None]:
 
 #generic sql statement -> DB
 def execute_sql_to_db(sql:str, conn:Connection, is_bulk_ingest=False)->tuple[list[tuple],list[str]]|None:
-    """
-    Cursor execution function to execute sql on sqllite3. 
-    Supports bulk ingestion with executescripts (i.e. multi-statements) into DB.
-    """ 
+    """Cursor execution function to execute sql on sqllite3. Supports bulk ingestion into database.""" 
     ctx = None
     try:
         ctx = conn.cursor()

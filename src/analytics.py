@@ -7,7 +7,7 @@ import logging
 logging.getLogger(__name__)
 
 def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path)->None:
-    """Generated desired analysis output from querying DB and processing in pandas. sql -> df (TBC) -> csv"""
+    """Generated analysis from SQL query and export to CSV"""
     for analysis, in_out_map in config_dict.items():
         for sql_file, csv_export_file in in_out_map.items():
             try:
