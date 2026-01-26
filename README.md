@@ -1,3 +1,6 @@
+# GIC Data Engineer Take-Home Assessment
+This code repository is a submission for GIC Data Engineer take-home.
+
 ## Assumptions/Scope of take-home submission
 
 1. Incoming Funds Data 
