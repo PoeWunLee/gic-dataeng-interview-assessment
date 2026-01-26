@@ -26,7 +26,7 @@ def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Pat
             except Exception:
                 logging.exception(f"Analysis {analysis} failed to complete.", exc_info=True)
                 raise
-        
+
         logging.info(f"{analysis} analysis completed. Exported results to {list(in_out_map.values())}.")
-
-
+    
+    return
