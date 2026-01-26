@@ -4,32 +4,29 @@ from utils.db_utils import init_db_connect,execute_sql_to_db, df_from_sql_result
 from utils.file_utils import save_df_to_csv, extract_sql_from_file
 
 import logging
-logging.basicConfig(level=logging.INFO)
-logger=logging.getLogger(__name__)
+logging.getLogger(__name__)
 
-
-def analyse(config_dict:dict[dict[str:str]], sql_root_dir:Path, export_root_dir:Path)->None:
+def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path)->None:
     """Generated desired analysis output from querying DB and processing in pandas. sql -> df (TBC) -> csv"""
-
-    for analysis, in_out_map  in config_dict.items():
-        logging.info(f"Analysis {analysis} Started")
-
+    for analysis, in_out_map in config_dict.items():
         for sql_file, csv_export_file in in_out_map.items():
-            # 0. getting file paths for sql queries and csv export
-            sql_filepath = sql_root_dir/ sql_file
-            csv_export_filepath = export_root_dir/ csv_export_file
-
-            # 1. extract sql from .sql
-            sql_statement = extract_sql_from_file(sql_filepath) 
-            #2. execute sql
-            with init_db_connect() as cnxn:
-                results, cols = execute_sql_to_db(sql_statement, cnxn)
-
-            #3. save to df
-            results_df = df_from_sql_results(results, cols)
-            #4. save to csv
-            save_df_to_csv(results_df,csv_export_filepath)
+            try:
+                # 0. getting file paths for sql queries and csv export
+                sql_filepath = sql_root_dir / sql_file
+                csv_export_filepath = export_root_dir / csv_export_file
+                # 1. extract sql from .sql
+                sql_statement = extract_sql_from_file(sql_filepath) 
+                #2. execute sql
+                with init_db_connect(cnxn_str) as cnxn:
+                    results, cols = execute_sql_to_db(sql_statement, cnxn)
+                #3. save to df
+                results_df = df_from_sql_results(results, cols)
+                #4. save to csv
+                save_df_to_csv(results_df,csv_export_filepath)
+            except Exception:
+                logging.exception(f"Analysis {analysis} failed to complete.", exc_info=True)
+                raise
         
-        logging.info(f"Analysis {analysis} Completed")
+        logging.info(f"{analysis} analysis completed. Exported results to {list(in_out_map.values())}.")
 
 

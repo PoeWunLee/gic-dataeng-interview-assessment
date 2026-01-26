@@ -73,7 +73,10 @@ consol_recon_cte as (
     JOIN equity_reference eref ON eref.SYMBOL=ef.SYMBOL
     WHERE ef.SYMBOL IS NOT NULL
 )
-SELECT DATETIME, FUND, sum(DIFF_PRICE_REF) as DIFF_FROM_REF
+SELECT 
+    DATETIME, 
+    FUND, 
+    sum(DIFF_PRICE_REF) as DIFF_FROM_REF
 FROM consol_recon_cte 
 GROUP BY 1,2
 ORDER BY 1,2

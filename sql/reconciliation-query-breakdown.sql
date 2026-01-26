@@ -74,5 +74,6 @@ consol_recon_cte as (
     WHERE ef.SYMBOL IS NOT NULL
 )
 SELECT *
-FROM consol_recon_cte WHERE DIFF_PRICE_REF <> 0
+FROM consol_recon_cte 
+WHERE DIFF_PRICE_REF <> 0
 ;

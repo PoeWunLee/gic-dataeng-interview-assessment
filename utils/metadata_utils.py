@@ -5,14 +5,13 @@ import re
 import logging
 
 #logging
-logging.basicConfig(level=logging.INFO)
-logger=logging.getLogger(__name__)
+logging.getLogger(__name__)
 
 def get_details_from_filename(filename:str, regex_exp:str, details_tag:str)->str|None:
     """Determine information from csv filename based on regex expression mapping"""
     matched_details= re.findall(regex_exp, filename, re.IGNORECASE)
     if len(matched_details) < 1:
-        logger.exception(f"Could not map {filename} to any {details_tag}")
+        logging.exception(f"Could not map {filename} to any {details_tag}")
         return
     return matched_details[0]
 
@@ -32,7 +31,7 @@ def parse_datetime_format(date_time_raw:str)->pd.Series|None:
         date_time_converted = pd.to_datetime(date_time_cleaned, format="mixed") #account for variety of datetime formats
         return date_time_converted
     except:
-        logger.exception(f"Unable to parse {date_time_raw} to a valid datetime format extracted from filename.")
+        logging.exception(f"Unable to parse {date_time_raw} to a valid datetime format extracted from filename.")
         raise
 
 def parse_staging_pathname(dest_root_path:Path,fund_name:str, date_str:str)->tuple[Path:Path]:
