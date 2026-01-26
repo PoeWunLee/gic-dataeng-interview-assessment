@@ -5,6 +5,7 @@ import pandas as pd
 from utils.file_utils import extract_csv_to_df, save_df_to_csv, generate_dir
 from utils.metadata_utils import parse_raw_details,enrich_raw_df_with_details, parse_staging_pathname
 
+logging.getLogger(__name__)
 
 def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_config:dict[str:str])->None:
     """Extract raw CSV with metadata enrichment, then save to staging directory"""
