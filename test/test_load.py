@@ -11,6 +11,7 @@ from src.load_data import load_funds
 
 @pytest.fixture
 def make_connection(tmp_path:Path):
+    """Fixture for temporary testing DB"""
     conn=sqlite3.connect(tmp_path/"test.db")
     ctx = conn.cursor()
     #create table from sql
@@ -60,8 +61,12 @@ def make_staging(tmp_path:Path, input_date_partition:str,input_fund_csv:str):
         ]
 )
 def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_connection, tmp_path):
+    """Test loaded funds"""
+    #arrange - connection and staging files and directories
     csv_path = make_staging
     make_connection
+
+    #act - load, and retrieve DB loaded results from select query
     load_funds(tmp_path/"test.db",[csv_path], "fund_position")
     with init_db_connect(tmp_path/"test.db") as cnxn:
         ctx = cnxn.cursor()
@@ -69,6 +74,8 @@ def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_conn
         result=ctx.fetchall()
         cols=[description[0] for description in ctx.description]
 
+    
+    #assert
     df_from_query = pd.DataFrame(result, columns=cols)
     df_from_csv = pd.read_csv(csv_path)
 

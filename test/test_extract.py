@@ -56,7 +56,7 @@ def test_extract_raw_to_stage(input_filename, output,tmp_path, make_dirs, make_c
     #act
     extract_raw_to_stage([csv_path], staging_root_path, PARSE_RAW_DETAILS_CONFIG)
     
-    #assert staging path is generatec correctly
+    #assert staging path is generated correctly
     staged_file=staging_root_path/output["date_time_partition"]/ "{}.csv".format(output["fund"])
     assert staged_file.exists()
 
