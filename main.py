@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 #load configs
 from config.file_configs import PARSE_RAW_DETAILS_CONFIG, RAW_FILENAME_EXT, STAGING_FILENAME_EXT
-from config.db_configs import DB_HOST, INIT_DB_SCRIPTS, FUND_TABLE_NAME
+from config.db_configs import INIT_DB_SCRIPTS, FUND_TABLE_NAME
 from config.analytics_configs import ANALYTICS_INPUT_OUTPUT_DICT
 
 #load generic utils
@@ -18,7 +18,7 @@ from src.load_data import load_funds
 from src.init_tables import init_tables
 from src.analytics import analyse_data
 
-#iload environment variables
+#load environment variables
 load_dotenv()
 CNXN_STR = os.getenv("CNXN_STR")
 
@@ -69,7 +69,7 @@ def main():
     """Main entrypoint function to run extract, stage, load, analyse steps"""
     path=get_paths()
     try:
-        if not os.path.isfile(DB_HOST):
+        if not os.path.isfile(CNXN_STR):
             run_init_tables(path)
         extract(path)
         load(path)

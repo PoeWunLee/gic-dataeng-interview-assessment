@@ -25,8 +25,8 @@ def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_confi
             except ValueError:
                 logging.exception(f"Error when parsing datetime format {date_time} for filename:{f}")
                 raise
-            #5. Export and stage file
             stage_file_dir, staged_file_name = parse_staging_pathname(dest_root_path,fund_name, date_str)
+            #5. Export and stage file
             generate_dir(stage_file_dir) #generate date directory if does not exist
             save_df_to_csv(enriched_df, staged_file_name)
             #6. update processed count
