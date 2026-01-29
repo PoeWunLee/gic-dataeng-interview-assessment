@@ -51,10 +51,10 @@ pytest test/test_analyse.py
 ```
 
 ## Design Details
-1. `main.py`
+### `main.py`
 Main entrypoint for the project to perform all operations (initialise, extract, load, analyse) run via command line.
 
-2. `src/`
+### `src/`
 ```
 ├───src
 │   │   analytics.py
@@ -68,8 +68,11 @@ Each file in this directory is an abstraction of each step in the ETL.
 - `extract_data.py`: Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
 - `load_data.py`: Load all CSV files from staging area to sqlite3 DB into fund_position table
 - `analytics.py`: Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
+> [!NOTE]
+> This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently
+> E.g. Four Airflow DAGs, each PythonOperator attached to `init_tables.py`, `extract_data.py`, `load_data.py` and `analytics.py`.
 
-3. `data/`
+### `data/`
 ```
 ├───data
 │   ├───raw
@@ -99,7 +102,7 @@ Repository of all data files that are involved in the ETL.
 - `/staging/`: Staged files post extaction and processing from extract step. Contains subdirectories partitioned by date in YYYY-MM-DD (for future efficient loading from stage to DB)
 - `/analytics/`: Exports of reconciliation analysis between funds vs reference price (summary and symbol level available) and analysis of monthly best performing funds.
 
-4. `sql/`
+### `sql/`
 ```
 ├───sql
 │   │  best-performing-fund.sql
@@ -110,7 +113,7 @@ Repository of all data files that are involved in the ETL.
 ```
 Contains sql scripts for execution. Includes DDL for table initiation, as well as select queries for analytics step.
 
-5. `utils/`
+### `utils/`
 ```
 └───utils
     │   db_utils.py
@@ -121,7 +124,7 @@ Contains sql scripts for execution. Includes DDL for table initiation, as well a
 ```
 Common utility scripts used and imported from other scripts in this repository, such as DB connection utilities.
 
-6. `test/`
+### `test/`
 ```
 ├───test
 │   │   test_analyse.py
@@ -164,4 +167,4 @@ Directory containing unit testing for key functions and components of the reposi
 4. Others
 - Logic to continue subsequent steps when previous steps are failing in ```main.py```
 - Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main()
-- Unit testing coverage on data related logic (e.g.results from analytics)
+- Unit testing coverage on data related logic (e.g.results from analytics).
