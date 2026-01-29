@@ -3,21 +3,21 @@ This code repository is a submission for GIC Data Engineer take-home.
 
 ## Setup instructions
 1. Clone this repo to local
-```
-git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
-```
+    ```
+    git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
+    ```
 
 2. Navigate to the root directory (gic-dataeng-interview-assessment), initialise a venv
-```
-cd gic-dataeng-interview-assessment
-python -m venv .venv
-```
+    ```
+    cd gic-dataeng-interview-assessment
+    python -m venv .venv
+    ```
 
 3. Install required dependencies and packages from pyproject.toml (pip or poetry)
-```
-pip install .
-poetry install
-```
+    ```
+    pip install .
+    poetry install
+    ```
 
 4. Create a .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
 
