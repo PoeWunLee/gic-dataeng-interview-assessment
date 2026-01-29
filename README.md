@@ -42,7 +42,7 @@ python main.py
 > - Some core utilites in parsing metadata of fund name and date are also included, which will directly impact extract step.
 > - Note that at the juncture of this submission, data quality and query level checks are not included, but is considered as a future enhancement.
 
-### Testing execution guide
+### Invoking Unit Testing
 The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
 ```
 pytest
