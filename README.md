@@ -35,110 +35,6 @@ main.py is the main entry point of this project. To trigger the load of fund pos
 ```
 python main.py
 ```
-
-## Design Details
-1. `main.py`
-Main entrypoint for the project to perform all operations (initialise, extract, load, analyse) run via command line.
-
-2. src/
-```
-├───src
-│   │   analytics.py
-│   │   extract_data.py
-│   │   init_tables.py
-│   │   load_data.py
-│   │   __init__.py
-```
-Each file in this directory is an abstraction of each step in the ETL. 
-- `init_tables`: Initialise tables (reference and fund postion) within the sqlite3 DB.
-- `extract_data.py`: Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
-- `load_data.py`: Load all CSV files from staging area to sqlite3 DB into fund_position table
-- `analytics.py`: Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
-
-3. data/
-```
-├───data
-│   ├───raw
-│   │       Applebead.28-02-2023 breakdown.csv
-│   │       Belaware.28_02_2023.csv
-│   │       Fund Whitestone.28-02-2023 - details.csv
-│   │ 			...
-│   │ 
-│   ├───staging
-│   │    ├───2022-08-31
-│   │    │       Applebead.csv
-│   │    │       Belaware.csv
-│   │    │ 		...
-│	│	 │	...
-│   │    └───2023-08-31
-│   │           Applebead.csv
-│   │           Belaware.csv
-│   │     		
-│   └───analytics
-│   │       mthly_top_performing_fund.csv
-│   │       recon_price_breakdown_by_symbol.csv
-│   │       recon_price_summary.csv
-│   │
-```
-
-```
-│   .env
-│   .gitignore
-│   main.py
-│   poetry.lock
-│   pyproject.toml
-│   README.md
-├───config
-│   │   analytics_configs.py
-│   │   db_configs.py
-│   │   file_configs.py
-│   │   __init__.py
-├───data
-│   ├───raw
-│   │       Applebead.28-02-2023 breakdown.csv
-│   │       Belaware.28_02_2023.csv
-│   │       Fund Whitestone.28-02-2023 - details.csv
-│   │ 			...
-│   │ 
-│   ├───staging
-│   │    ├───2022-08-31
-│   │    │       Applebead.csv
-│   │    │       Belaware.csv
-│   │    │ 		...
-│	│	 │	...
-│   │    └───2023-08-31
-│   │           Applebead.csv
-│   │           Belaware.csv
-│   │     		
-│   └───analytics
-│   │       mthly_top_performing_fund.csv
-│   │       recon_price_breakdown_by_symbol.csv
-│   │       recon_price_summary.csv
-│   │
-├───sql
-│   │  best-performing-fund.sql
-│   │  fund-position.sql
-│   │  master-reference-sql.sql
-│   │  reconciliation-query-breakdown.sql
-│   │  reconciliation-query-summary.sql
-├───src
-│   │   analytics.py
-│   │   extract_data.py
-│   │   init_tables.py
-│   │   load_data.py
-│   │   __init__.py
-├───test
-│   │   test_analyse.py
-│   │   test_extract.py
-│   │   test_load.py
-│   │   __init__.py
-└───utils
-    │   db_utils.py
-    │   file_utils.py
-    │   log_utils.py
-    │   metadata_utils.py
-    │   __init__.py
-```
 ## Unit Testing
 The pytest suite is used for unit testing of the src functions for each step of the ETL.
 
@@ -153,6 +49,87 @@ pytest test/test_extract.py
 pytest test/test_load.py
 pytest test/test_analyse.py
 ```
+
+## Design Details
+1. `main.py`
+Main entrypoint for the project to perform all operations (initialise, extract, load, analyse) run via command line.
+
+2. `src/`
+```
+├───src
+│   │   analytics.py
+│   │   extract_data.py
+│   │   init_tables.py
+│   │   load_data.py
+│   │   __init__.py
+```
+Each file in this directory is an abstraction of each step in the ETL. 
+- `init_tables.py`: Initialise tables (reference and fund postion) within the sqlite3 DB.
+- `extract_data.py`: Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
+- `load_data.py`: Load all CSV files from staging area to sqlite3 DB into fund_position table
+- `analytics.py`: Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
+
+3. `data/`
+```
+├───data
+│   ├───raw
+│   │       Applebead.28-02-2023 breakdown.csv
+│   │       Belaware.28_02_2023.csv
+│   │       Fund Whitestone.28-02-2023 - details.csv
+│   │ 			...
+│   │ 
+│   ├───staging
+│   │    ├───2022-08-31
+│   │    │       Applebead.csv
+│   │    │       Belaware.csv
+│   │    │ 		...
+│	│	 │	...
+│   │    └───2023-08-31
+│   │           Applebead.csv
+│   │           Belaware.csv
+│   │     		
+│   └───analytics
+│   │       mthly_top_performing_fund.csv
+│   │       recon_price_breakdown_by_symbol.csv
+│   │       recon_price_summary.csv
+│   │
+```
+Repository of all data files that are involved in the ETL.
+- `/raw/`: First landing directory of raw fund CSVs.
+- `/staging/`: Staged files post extaction and processing from extract step. Contains subdirectories partitioned by date in YYYY-MM-DD (for future efficient loading from stage to DB)
+- `/analytics/`: Exports of reconciliation analysis between funds vs reference price (summary and symbol level available) and analysis of monthly best performing funds.
+
+4. `sql/`
+```
+├───sql
+│   │  best-performing-fund.sql
+│   │  fund-position.sql
+│   │  master-reference-sql.sql
+│   │  reconciliation-query-breakdown.sql
+│   │  reconciliation-query-summary.sql
+```
+Contains sql scripts for execution. Includes DDL for table initiation, as well as select queries for analytics step.
+
+5. `utils/`
+```
+└───utils
+    │   db_utils.py
+    │   file_utils.py
+    │   log_utils.py
+    │   metadata_utils.py
+    │   __init__.py
+```
+Common utility scripts used and imported from other scripts in this repository, such as DB connection utilities.
+
+6. `test/`
+```
+├───test
+│   │   test_analyse.py
+│   │   test_extract.py
+│   │   test_load.py
+│   │   __init__.py
+```
+Directory containing unit testing for key functions and components of the repository. Namely load, extract and analyse.
 
 ## Assumptions/Scope of take-home submission
 
