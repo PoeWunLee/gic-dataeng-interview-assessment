@@ -1,10 +1,7 @@
 from pathlib import Path
 import pandas as pd
 from typing import Generator
-import logging
 import os
-
-logging.getLogger(__name__)
 
 ##Generic##
 def get_files(dir:Path, ext:str)->Generator:

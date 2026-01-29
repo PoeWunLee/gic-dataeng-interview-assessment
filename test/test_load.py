@@ -6,7 +6,7 @@ import sqlite3
 
 CURRENT_FILE_DIR=Path(__file__).parent.parent.absolute()
 sys.path.append(CURRENT_FILE_DIR)
-from utils.db_utils import insert_df_to_db, init_db_connect
+from utils.db_utils import init_db_connect
 from src.load_data import load_funds
 
 @pytest.fixture
@@ -35,10 +35,14 @@ def make_connection(tmp_path:Path):
 @pytest.fixture
 def make_staging(tmp_path:Path, input_date_partition:str,input_fund_csv:str):
     """Fixture to create tmp directory and files for staging"""
+
+    #provide and make directory for staging
     tmp_dir = tmp_path/"staging"/input_date_partition
     tmp_dir.mkdir(parents=True, exist_ok=True)
     tmp_file=tmp_dir/input_fund_csv
     fund_name=input_fund_csv.split(".")[0]
+
+    #write dummy data
     with open(tmp_file, 'w') as f:
         f.write(f"""FINANCIAL TYPE,SYMBOL,SECURITY NAME,SEDOL,PRICE,QUANTITY,REALISED P/L,MARKET VALUE,FUND,DATETIME\n
     Equities,AVGO,Broadcom Inc.,,460.45,138610.07658144084,589429.6018720224,63823009.76192443,{fund_name},{input_date_partition}""")
@@ -61,7 +65,7 @@ def make_staging(tmp_path:Path, input_date_partition:str,input_fund_csv:str):
         ]
 )
 def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_connection, tmp_path):
-    """Test loaded funds"""
+    """Unit testing for main load logic"""
     #arrange - connection and staging files and directories
     csv_path = make_staging
     make_connection
@@ -74,7 +78,6 @@ def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_conn
         result=ctx.fetchall()
         cols=[description[0] for description in ctx.description]
 
-    
     #assert
     df_from_query = pd.DataFrame(result, columns=cols)
     df_from_csv = pd.read_csv(csv_path)

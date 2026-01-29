@@ -1,8 +1,7 @@
 from __future__ import annotations
 import sqlite3
-from sqlite3 import Connection, Cursor
+from sqlite3 import Connection
 from typing import Generator
-from pathlib import Path
 from contextlib import contextmanager
 import pandas as pd
 import logging

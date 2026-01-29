@@ -22,6 +22,9 @@ This code repository is a submission for GIC Data Engineer take-home.
 5. Execution of the solution
 - assumed to be run locally without orchestration/scheduling or production deployments
 
+## Design Decision Notes
+
+
 ## Gaps to productionise from submission
 1. Incremental ingestion and handling
 2. Orchestration

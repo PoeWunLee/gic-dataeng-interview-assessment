@@ -1,13 +1,13 @@
 import pytest
 from pathlib import Path
-from utils.metadata_utils import parse_raw_details, enrich_raw_df_with_details, parse_staging_pathname
+from utils.metadata_utils import parse_raw_details, enrich_raw_df_with_details
 from config.file_configs import PARSE_RAW_DETAILS_CONFIG
 from src.extract_data import extract_raw_to_stage
 import pandas as pd
 
 ##Unit Testing of main extract step
 @pytest.fixture
-def make_dirs(tmp_path:Path)->dict[str:Path]:
+def make_dirs(tmp_path:Path)->dict[str,Path]:
     """Fixture to create tmp directories for raw and staging"""
     path_dict = {
         "raw": tmp_path/"raw",
@@ -20,7 +20,7 @@ def make_dirs(tmp_path:Path)->dict[str:Path]:
     return path_dict
 
 @pytest.fixture
-def make_csv(make_dirs:dict[str:Path], input_filename:str):
+def make_csv(make_dirs:dict[str,Path], input_filename:str):
     """Fixture to create raw csv file"""
     raw_csv = make_dirs["raw"] / input_filename
     with open(raw_csv, 'w') as r:
@@ -47,8 +47,9 @@ def make_csv(make_dirs:dict[str:Path], input_filename:str):
      
     ]
 )
-def test_extract_raw_to_stage(input_filename, output,tmp_path, make_dirs, make_csv):
-    """Testing main extract function"""
+def test_extract_raw_to_stage(input_filename:str, output:dict[str,str],tmp_path:Path, make_dirs, make_csv):
+    """Unit testing main extract function"""
+
     #arrange for tmp dir
     csv_path = make_csv
     staging_root_path = make_dirs["staging"]
@@ -85,7 +86,8 @@ def test_extract_raw_to_stage(input_filename, output,tmp_path, make_dirs, make_c
      
     ]
 )
-def test_parse_raw_details(input_filename, output):
+def test_parse_raw_details(input_filename:str, output:dict[str,str|None]):
+    """Unit testing for key util - raw details parsing from filename"""
     assert parse_raw_details(input_filename, PARSE_RAW_DETAILS_CONFIG)==output
 
 @pytest.mark.parametrize(
@@ -105,7 +107,8 @@ def test_parse_raw_details(input_filename, output):
 
 )
 def test_enrich_raw_df_with_details(input_fundname, input_date, output_results):
-    #generate random df
+    """Unit testing key util - enrich fund and datetime details into staging export"""
+    #arrange - generate random df
     random_df = pd.DataFrame(["random_value"], columns=["random_col"])
     #act
     results_df = enrich_raw_df_with_details(random_df, input_fundname, input_date)

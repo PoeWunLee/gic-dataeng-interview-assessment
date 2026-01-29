@@ -4,9 +4,6 @@ import pandas as pd
 import re
 import logging
 
-#logging
-logging.getLogger(__name__)
-
 def get_details_from_filename(filename:str, regex_exp:str, details_tag:str)->str|None:
     """Determine metadata from csv filename based on regex expression mapping"""
     matched_details= re.findall(regex_exp, filename, re.IGNORECASE)
@@ -15,7 +12,7 @@ def get_details_from_filename(filename:str, regex_exp:str, details_tag:str)->str
         return
     return matched_details[0]
 
-def parse_raw_details(filename:Path, raw_config:dict[str:str])->dict[str:str]:
+def parse_raw_details(filename:Path, raw_config:dict[str,str])->dict[str,str]:
     """"Retrieve each file's fund name and date from regex"""
     filename_str = str(filename) #conversion to str for regexp input
     parsed_results = {
@@ -35,7 +32,7 @@ def parse_datetime_format(date_time_raw:str)->pd.Series|None:
         logging.exception(f"Unable to parse {date_time_raw} to a valid datetime format extracted from filename.")
         raise
 
-def parse_staging_pathname(dest_root_path:Path,fund_name:str, date_str:str)->tuple[Path:Path]:
+def parse_staging_pathname(dest_root_path:Path,fund_name:str, date_str:str)->tuple[Path,Path]:
     """Parses and returns required staging files dir and filenames based on metadata"""
     stage_file_dir = dest_root_path / date_str
     staged_file_name = stage_file_dir / f"{fund_name}.csv"
