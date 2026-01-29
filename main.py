@@ -26,7 +26,7 @@ CNXN_STR = os.getenv("CNXN_STR")
 init_logger()
 
 #parsing paths
-def get_paths()->dict[str:Path]:
+def get_paths()->dict[str,Path]:
     """Parse all paths in a dictionary to be passed into each pipeline step"""
     root = Path(__file__).parent.absolute()
     directories = {

@@ -24,7 +24,6 @@ def init_db_connect(cnxn_str:str)->Generator[Connection, None, None]:
         if conn:
             conn.close()
 
-#generic sql statement -> DB
 def execute_sql_to_db(sql:str, conn:Connection, is_bulk_ingest=False)->tuple[list[tuple],list[str]]|None:
     """Cursor execution function to execute sql on sqllite3. Supports bulk ingestion into database.""" 
     ctx = None

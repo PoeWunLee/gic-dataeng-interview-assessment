@@ -137,7 +137,7 @@ def make_dir(tmp_path:Path, input_sql:str):
         )
     ]
 )
-def test_analyse_data(input_sql:str, output_results:str|int|float, tmp_path:Path,make_dir, make_data,):
+def test_analyse_data(input_sql:str, output_results:str|int|float, tmp_path:Path,make_dir, make_data):
     """Unit testing for various sql commands executed"""
     #arrange - initialise DB, create tables, insert dummy data. provide input and output filepaths for function
     make_data

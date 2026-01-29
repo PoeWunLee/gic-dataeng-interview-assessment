@@ -106,7 +106,7 @@ def test_parse_raw_details(input_filename:str, output:dict[str,str|None]):
     ]
 
 )
-def test_enrich_raw_df_with_details(input_fundname, input_date, output_results):
+def test_enrich_raw_df_with_details(input_fundname:str, input_date:str, output_results:list[str]):
     """Unit testing key util - enrich fund and datetime details into staging export"""
     #arrange - generate random df
     random_df = pd.DataFrame(["random_value"], columns=["random_col"])
