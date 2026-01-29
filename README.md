@@ -7,7 +7,7 @@ This code repository is a submission for GIC Data Engineer take-home assessment.
     git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
     ```
 
-2. Navigate to the root directory (gic-dataeng-interview-assessment), initialise a venv
+2. Navigate to the root directory (~/gic-dataeng-interview-assessment), initialise a venv
     ```
     cd gic-dataeng-interview-assessment
     python -m venv .venv
