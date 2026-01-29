@@ -200,7 +200,7 @@ Directory containing configuration details such as file naming conventions, data
 5. Execution of the solution
 - assumed to be run locally without orchestration/scheduling or production deployments
 
-## Notes on known potential feature enhancements
+## Potential future enhancements
 1. Extract
 - Logic to skip erronous file while continuing to extract others
 - Incremental ingestion and handling
