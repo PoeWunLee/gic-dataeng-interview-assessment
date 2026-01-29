@@ -7,36 +7,28 @@ This code repository is a submission for GIC Data Engineer take-home.
 git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
 ```
 
-2. Navigate to the root directory (gic-dataeng-interview-assessment). 
+2. Navigate to the root directory (gic-dataeng-interview-assessment), initialise a venv
 ```
 cd gic-dataeng-interview-assessment
-```
-
-3. Initialise a virtual environment (optional but recommended)
-```
 python -m venv .venv
 ```
 
-4. Install required dependencies and packages from pyproject.toml
-pip:
+3. Install required dependencies and packages from pyproject.toml (pip or poetry)
 ```
 pip install .
-```
-poetry:
-```
 poetry install
 ```
 
-5. Create a .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
+4. Create a .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
 
-Powershell:
-```
-New-Item -Path .env -ItemType File -Value "CNXN_STR='gic.db'"
-```
-Bash:
-```
-echo "CNXN_STR='gic.db'" > .env
-```
+    Powershell:
+    ```
+    New-Item -Path .env -ItemType File -Value "CNXN_STR='gic.db'"
+    ```
+    Bash:
+    ```
+    echo "CNXN_STR='gic.db'" > .env
+    ```
 
 ## Assumptions/Scope of take-home submission
 
