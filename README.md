@@ -36,9 +36,14 @@ main.py is the main entry point of this project. To trigger the load of fund pos
 python main.py
 ```
 ## Unit Testing
-The pytest suite is used for unit testing of the src functions for each step of the ETL.
 
-To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
+> [!NOTE]
+> Unit tests are conducted for core pipeline logic i.e. extract, load and analyse, while other utility functions such as purely using third party libraries are omitted for practicality, and avoidance of overtesting. (e.g. connection initiation to DB with sqlite3 standard packages)
+> Some core utilites in parsing metadata of fund name and date are also included, which will directly impact extract step.
+> Note that at the juncture of this submission, data quality and query level checks are not included, but is considered as a future enhancement.
+
+### Testing execution guide
+The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
 ```
 pytest
 ```
@@ -51,10 +56,43 @@ pytest test/test_analyse.py
 ```
 
 ## Design Details
-### `main.py`
+
+### High level pipeline flow
+```
+Raw CSVs
+   ↓
+Extract & Enrich
+   ↓
+Staging (partitioned by date)
+   ↓
+Load into SQLite
+   ↓
+Analytics Queries
+   ↓
+CSV Outputs
+```
+
+### Pipeline Components
+1. Extract (`extract_data.py`)
+- reads inconsistently named CSV fund file names
+- parses the following metadata from filenames:
+    - fund name
+    - date
+- enriches each extract with these metdata, and writes them to staging partitioned by date sub-directories
+
+2. Load (`load_data.py`)
+- reads staged CSVs
+- loads data into fund_position table in sqlite DB with a consistent schema
+
+3. Analyse (`analytics.py`)
+- runs sql based analytics on price reconciliation (available in fund level summary/symbol level breakdown) and best performing fund by month
+
+
+### Detailed Directory Breakdown
+#### `main.py`
 Main entrypoint for the project to perform all operations (initialise, extract, load, analyse) run via command line.
 
-### `src/`
+#### `src/`
 ```
 ├───src
 │   │   analytics.py
@@ -64,15 +102,11 @@ Main entrypoint for the project to perform all operations (initialise, extract, 
 │   │   __init__.py
 ```
 Each file in this directory is an abstraction of each step in the ETL. 
-- `init_tables.py`: Initialise tables (reference and fund postion) within the sqlite3 DB.
-- `extract_data.py`: Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
-- `load_data.py`: Load all CSV files from staging area to sqlite3 DB into fund_position table
-- `analytics.py`: Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
 > [!NOTE]
 > This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently
 > E.g. Four Airflow DAGs, each PythonOperator attached to `init_tables.py`, `extract_data.py`, `load_data.py` and `analytics.py`.
 
-### `data/`
+#### `data/`
 ```
 ├───data
 │   ├───raw
@@ -102,7 +136,7 @@ Repository of all data files that are involved in the ETL.
 - `/staging/`: Staged files post extaction and processing from extract step. Contains subdirectories partitioned by date in YYYY-MM-DD (for future efficient loading from stage to DB)
 - `/analytics/`: Exports of reconciliation analysis between funds vs reference price (summary and symbol level available) and analysis of monthly best performing funds.
 
-### `sql/`
+#### `sql/`
 ```
 ├───sql
 │   │  best-performing-fund.sql
@@ -113,7 +147,7 @@ Repository of all data files that are involved in the ETL.
 ```
 Contains sql scripts for execution. Includes DDL for table initiation, as well as select queries for analytics step.
 
-### `utils/`
+#### `utils/`
 ```
 └───utils
     │   db_utils.py
@@ -124,7 +158,7 @@ Contains sql scripts for execution. Includes DDL for table initiation, as well a
 ```
 Common utility scripts used and imported from other scripts in this repository, such as DB connection utilities.
 
-### `test/`
+#### `test/`
 ```
 ├───test
 │   │   test_analyse.py
@@ -133,6 +167,16 @@ Common utility scripts used and imported from other scripts in this repository, 
 │   │   __init__.py
 ```
 Directory containing unit testing for key functions and components of the repository. Namely load, extract and analyse.
+
+#### `configs/`
+├───config
+│   │   analytics_configs.py
+│   │   db_configs.py
+│   │   file_configs.py
+│   │   __init__.py
+Directory containing configuration details such as file naming conventions, database reference scripts for DDL etc.
+
+
 
 ## Assumptions/Scope of take-home submission
 
@@ -167,4 +211,4 @@ Directory containing unit testing for key functions and components of the reposi
 4. Others
 - Logic to continue subsequent steps when previous steps are failing in ```main.py```
 - Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main()
-- Unit testing coverage on data related logic (e.g.results from analytics).
+- Unit testing coverage on data quality/query related logic (e.g.results from analytics).
