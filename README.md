@@ -38,9 +38,9 @@ python main.py
 ## Unit Testing
 
 > [!NOTE]
-> Unit tests are conducted for core pipeline logic i.e. extract, load and analyse, while other utility functions such as purely using third party libraries are omitted for practicality, and avoidance of overtesting. (e.g. connection initiation to DB with sqlite3 standard packages)
-> Some core utilites in parsing metadata of fund name and date are also included, which will directly impact extract step.
-> Note that at the juncture of this submission, data quality and query level checks are not included, but is considered as a future enhancement.
+> - Unit tests are conducted for core pipeline logic i.e. extract, load and analyse, while other utility functions such as purely using third party libraries are omitted for practicality, and avoidance of overtesting. (e.g. connection initiation to DB with sqlite3 standard packages).
+> - Some core utilites in parsing metadata of fund name and date are also included, which will directly impact extract step.
+> - Note that at the juncture of this submission, data quality and query level checks are not included, but is considered as a future enhancement.
 
 ### Testing execution guide
 The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
@@ -103,8 +103,8 @@ Main entrypoint for the project to perform all operations (initialise, extract, 
 ```
 Each file in this directory is an abstraction of each step in the ETL. 
 > [!NOTE]
-> This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently
-> E.g. Four Airflow DAGs, each PythonOperator attached to `init_tables.py`, `extract_data.py`, `load_data.py` and `analytics.py`.
+> - This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently
+> - E.g. Four Airflow DAGs, each PythonOperator attached to `init_tables.py`, `extract_data.py`, `load_data.py` and `analytics.py`.
 
 #### `data/`
 ```
@@ -169,13 +169,14 @@ Common utility scripts used and imported from other scripts in this repository, 
 Directory containing unit testing for key functions and components of the repository. Namely load, extract and analyse.
 
 #### `configs/`
+```
 ├───config
 │   │   analytics_configs.py
 │   │   db_configs.py
 │   │   file_configs.py
 │   │   __init__.py
+```
 Directory containing configuration details such as file naming conventions, database reference scripts for DDL etc.
-
 
 
 ## Assumptions/Scope of take-home submission
