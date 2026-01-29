@@ -1,7 +1,7 @@
-# GIC Data Engineer Take-Home Assessment
-This code repository is a submission for GIC Data Engineer take-home.
+# Overview
+This code repository is a submission for GIC Data Engineer take-home assessment.
 
-## Setup instructions
+## Getting Started
 1. Clone this repo to local
     ```
     git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
@@ -19,7 +19,7 @@ This code repository is a submission for GIC Data Engineer take-home.
     poetry install
     ```
 
-4. Create a .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
+4. Create an .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
 
     Powershell:
     ```
@@ -29,6 +29,35 @@ This code repository is a submission for GIC Data Engineer take-home.
     ```
     echo "CNXN_STR='gic.db'" > .env
     ```
+
+## Usage
+main.py is the main entry point of this project. To trigger the load of fund position, run the following in terminal.
+```
+python main.py
+```
+
+The following ETL process will be triggered upon invocation of main.py
+- Initialise a sqlite3 DB with tables (reference and fund postion) initialised.
+- Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
+- Load all CSV files from staging area to sqlite3 DB into fund_position table
+- Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
+
+
+## Unit Testing
+The pytest suite is used for unit testing of the src functions for each step of the ETL.
+
+To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
+```
+pytest
+```
+
+or run individual pytest 
+```
+pytest test/test_extract.py
+pytest test/test_load.py
+pytest test/test_analyse.py
+```
+
 
 ## Assumptions/Scope of take-home submission
 
@@ -50,8 +79,6 @@ This code repository is a submission for GIC Data Engineer take-home.
 
 5. Execution of the solution
 - assumed to be run locally without orchestration/scheduling or production deployments
-
-## Design Decision Notes
 
 
 ## Gaps to productionise from submission
