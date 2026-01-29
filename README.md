@@ -35,13 +35,52 @@ main.py is the main entry point of this project. To trigger the load of fund pos
 ```
 python main.py
 ```
-The following ETL process will be triggered upon invocation of main.py
-- Initialise a sqlite3 DB with tables (reference and fund postion) initialised.
-- Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
-- Load all CSV files from staging area to sqlite3 DB into fund_position table
-- Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
 
-## Design
+## Design Details
+1. `main.py`
+Main entrypoint for the project to perform all operations (initialise, extract, load, analyse) run via command line.
+
+2. src/
+```
+├───src
+│   │   analytics.py
+│   │   extract_data.py
+│   │   init_tables.py
+│   │   load_data.py
+│   │   __init__.py
+```
+Each file in this directory is an abstraction of each step in the ETL. 
+- `init_tables`: Initialise tables (reference and fund postion) within the sqlite3 DB.
+- `extract_data.py`: Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
+- `load_data.py`: Load all CSV files from staging area to sqlite3 DB into fund_position table
+- `analytics.py`: Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
+
+3. data/
+```
+├───data
+│   ├───raw
+│   │       Applebead.28-02-2023 breakdown.csv
+│   │       Belaware.28_02_2023.csv
+│   │       Fund Whitestone.28-02-2023 - details.csv
+│   │ 			...
+│   │ 
+│   ├───staging
+│   │    ├───2022-08-31
+│   │    │       Applebead.csv
+│   │    │       Belaware.csv
+│   │    │ 		...
+│	│	 │	...
+│   │    └───2023-08-31
+│   │           Applebead.csv
+│   │           Belaware.csv
+│   │     		
+│   └───analytics
+│   │       mthly_top_performing_fund.csv
+│   │       recon_price_breakdown_by_symbol.csv
+│   │       recon_price_summary.csv
+│   │
+```
+
 ```
 │   .env
 │   .gitignore
@@ -100,8 +139,6 @@ The following ETL process will be triggered upon invocation of main.py
     │   metadata_utils.py
     │   __init__.py
 ```
-
-
 ## Unit Testing
 The pytest suite is used for unit testing of the src functions for each step of the ETL.
 
@@ -138,9 +175,16 @@ pytest test/test_analyse.py
 5. Execution of the solution
 - assumed to be run locally without orchestration/scheduling or production deployments
 
-
-## Gaps to productionise from submission
-1. Incremental ingestion and handling
-2. Orchestration
-3. Data Quality management
-4. Table/query/view performance considerations (e.g. indexing)
+## Notes on known potential feature enhancements
+1. Extract
+- Logic to skip erronous file while continuing to extract others
+- Incremental ingestion and handling
+- Produce extract report/extract history
+2. Load
+- Load by specific date partitions
+3. Analyse
+- Enhancing to use pandas in post processing of SQL query from DB
+4. Others
+- Logic to continue subsequent steps when previous steps are failing in ```main.py```
+- Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main()
+- Unit testing coverage on data related logic (e.g.results from analytics)
