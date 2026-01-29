@@ -3,27 +3,40 @@ This code repository is a submission for GIC Data Engineer take-home.
 
 ## Setup instructions
 1. Clone this repo to local
-```git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git ```
+```
+git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
+```
 
 2. Navigate to the root directory (gic-dataeng-interview-assessment). 
-```cd gic-dataeng-interview-assessment```
+```
+cd gic-dataeng-interview-assessment
+```
 
 3. Initialise a virtual environment (optional but recommended)
-```python -m venv .venv```
+```
+python -m venv .venv
+```
 
 4. Install required dependencies and packages from pyproject.toml
 pip:
-```pip install .```
+```
+pip install .
+```
 poetry:
-```poetry install```
+```
+poetry install
+```
 
-5. Create a .env file and initialise DB connection string env variabled name CNXN_STR. 
+5. Create a .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
 
-For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')
-
-Run the following command for Windows Powershell or Bash to initialise
-```New-Item -Path .env -ItemType File -Value "CNXN_STR='gic.db'"```
-```echo "CNXN_STR='gic.db'" > .env```
+Powershell:
+```
+New-Item -Path .env -ItemType File -Value "CNXN_STR='gic.db'"
+```
+Bash:
+```
+echo "CNXN_STR='gic.db'" > .env
+```
 
 ## Assumptions/Scope of take-home submission
 
