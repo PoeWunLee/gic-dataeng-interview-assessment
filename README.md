@@ -35,12 +35,71 @@ main.py is the main entry point of this project. To trigger the load of fund pos
 ```
 python main.py
 ```
-
 The following ETL process will be triggered upon invocation of main.py
 - Initialise a sqlite3 DB with tables (reference and fund postion) initialised.
 - Extract raw funds CSV to staging directory, with enrichment of metadata (fundname and date) in content of CSV.
 - Load all CSV files from staging area to sqlite3 DB into fund_position table
 - Perform fund reconciliation and best performing fund analyses, exporting the results as CSV.
+
+## Design
+```
+│   .env
+│   .gitignore
+│   main.py
+│   poetry.lock
+│   pyproject.toml
+│   README.md
+├───config
+│   │   analytics_configs.py
+│   │   db_configs.py
+│   │   file_configs.py
+│   │   __init__.py
+├───data
+│   ├───raw
+│   │       Applebead.28-02-2023 breakdown.csv
+│   │       Belaware.28_02_2023.csv
+│   │       Fund Whitestone.28-02-2023 - details.csv
+│   │ 			...
+│   │ 
+│   ├───staging
+│   │    ├───2022-08-31
+│   │    │       Applebead.csv
+│   │    │       Belaware.csv
+│   │    │ 		...
+│	│	 │	...
+│   │    └───2023-08-31
+│   │           Applebead.csv
+│   │           Belaware.csv
+│   │     		
+│   └───analytics
+│   │       mthly_top_performing_fund.csv
+│   │       recon_price_breakdown_by_symbol.csv
+│   │       recon_price_summary.csv
+│   │
+├───sql
+│   │  best-performing-fund.sql
+│   │  fund-position.sql
+│   │  master-reference-sql.sql
+│   │  reconciliation-query-breakdown.sql
+│   │  reconciliation-query-summary.sql
+├───src
+│   │   analytics.py
+│   │   extract_data.py
+│   │   init_tables.py
+│   │   load_data.py
+│   │   __init__.py
+├───test
+│   │   test_analyse.py
+│   │   test_extract.py
+│   │   test_load.py
+│   │   __init__.py
+└───utils
+    │   db_utils.py
+    │   file_utils.py
+    │   log_utils.py
+    │   metadata_utils.py
+    │   __init__.py
+```
 
 
 ## Unit Testing
