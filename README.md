@@ -58,7 +58,6 @@ pytest test/test_load.py
 pytest test/test_analyse.py
 ```
 
-
 ## Assumptions/Scope of take-home submission
 
 1. Incoming Funds Data 

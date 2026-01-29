@@ -45,8 +45,8 @@ def get_paths()->dict[str:Path]:
     return directories
 
 #wrapper for each step
-def run_init_tables(path:dict[str,Path]):
-    """Init DB and tables"""
+def initialise(path:dict[str,Path]):
+    """Initialise DB and required tables (bond and equity references, bond and equity price, fund position)"""
     logging.info("STARTED: [INITALISE]")
     init_tables(CNXN_STR,init_db_configs=INIT_DB_SCRIPTS, root_sql_path=path["sql"])
     logging.info("COMPLETED: [INITALISE]\n")
@@ -82,7 +82,7 @@ def main()->None:
 
     try:
         if not os.path.isfile(CNXN_STR):
-            run_init_tables(path)
+            initialise(path) #initialise if sqlite3 matching CNXN_STR name not found
         extract(path)
         load(path)
         analyse(path)
