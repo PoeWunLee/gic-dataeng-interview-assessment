@@ -42,11 +42,11 @@ main.py is the main entry point of this project. To trigger the load of fund pos
 > [!NOTE]
 > Depending on python installation, python command may be python/py/python3
 
-```
-python main.py
-py main.py
-python3 main.py
-```
+    ```
+    python main.py
+    py main.py
+    python3 main.py
+    ```
 Successful output display should look like the following
 
 ![alt text](image.png)
@@ -237,6 +237,7 @@ Directory containing configuration details such as file naming conventions, data
     - Incremental ingestion and handling
     - Produce extract report/extract history
 2. Load
+    - Upsert logic to update previously loaded records that changed, insert new records, while ignore unchanged records (currently appends only  logic. Duplicated records expected if identical run)
     - Load by specific date partitions
 3. Analyse
     - Enhancing to use pandas for further post-SQL query processing
