@@ -55,6 +55,11 @@ pytest test/test_load.py
 pytest test/test_analyse.py
 ```
 
+For verbose pytest output for each test case, add -vv arguments
+```
+pytest -vv
+```
+
 ## Design Details
 
 ### High level pipeline flow
