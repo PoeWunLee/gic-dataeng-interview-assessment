@@ -32,9 +32,16 @@ This code repository is a submission for GIC Data Engineer take-home assessment.
 
 ## Usage
 main.py is the main entry point of this project. To trigger the load of fund position, run the following in terminal.
+
+> [!NOTE]
+> Depending on python installation, python command may be python/py/python3
+
 ```
 python main.py
+py main.py
+python3 main.py
 ```
+Successful output shou
 ## Unit Testing
 
 > [!NOTE]
