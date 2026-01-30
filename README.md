@@ -48,20 +48,20 @@ python3 main.py
 
 Successful output display should look like the following
 
-    ```
-    | INFO | 2026-01-30 09:59:08 | STARTED: [EXTRACT]
-    | INFO | 2026-01-30 09:59:09 | Extracted 130 files to staging directory. 
-    | INFO | 2026-01-30 09:59:09 | COMPLETED: [EXTRACT]
+```
+| INFO | 2026-01-30 09:59:08 | STARTED: [EXTRACT]
+| INFO | 2026-01-30 09:59:09 | Extracted 130 files to staging directory. 
+| INFO | 2026-01-30 09:59:09 | COMPLETED: [EXTRACT]
 
-    | INFO | 2026-01-30 09:59:09 | STARTED: [LOAD]
-    | INFO | 2026-01-30 09:59:13 | Loaded 10309 records into database table fund_position. 
-    | INFO | 2026-01-30 09:59:13 | COMPLETED: [LOAD]
+| INFO | 2026-01-30 09:59:09 | STARTED: [LOAD]
+| INFO | 2026-01-30 09:59:13 | Loaded 10309 records into database table fund_position. 
+| INFO | 2026-01-30 09:59:13 | COMPLETED: [LOAD]
 
-    | INFO | 2026-01-30 09:59:13 | STARTED: [ANALYTICS]
-    | INFO | 2026-01-30 09:59:19 | Fund Reconciliation analysis completed. Exported results to ['recon_price_breakdown_by_symbol.csv', 'recon_price_summary.csv']. 
-    | INFO | 2026-01-30 09:59:19 | Best Performing Fund analysis completed. Exported results to ['mthly_top_performing_fund.csv']. 
-    | INFO | 2026-01-30 09:59:19 | COMPLETED: [ANALYTICS]
-    ```
+| INFO | 2026-01-30 09:59:13 | STARTED: [ANALYTICS]
+| INFO | 2026-01-30 09:59:19 | Fund Reconciliation analysis completed. Exported results to ['recon_price_breakdown_by_symbol.csv', 'recon_price_summary.csv']. 
+| INFO | 2026-01-30 09:59:19 | Best Performing Fund analysis completed. Exported results to ['mthly_top_performing_fund.csv']. 
+| INFO | 2026-01-30 09:59:19 | COMPLETED: [ANALYTICS]
+```
 
 ## Unit Testing
 
