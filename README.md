@@ -7,19 +7,25 @@ This code repository is a submission for GIC Data Engineer take-home assessment.
     git clone https://github.com/PoeWunLee/gic-dataeng-interview-assessment.git 
     ```
 
-2. Navigate to the root directory (~/gic-dataeng-interview-assessment), initialise a venv
+2. Navigate to the root directory (~/gic-dataeng-interview-assessment)
     ```
     cd gic-dataeng-interview-assessment
-    python -m venv .venv
+
     ```
 
-3. Install required dependencies and packages from pyproject.toml (pip or poetry)
+3. (Optional) initialise and activate a virtual environment
+    ```
+        python -m venv .venv
+        .venv/Scripts/activate
+    ```
+
+4. Install required dependencies and packages from pyproject.toml (pip or poetry)
     ```
     pip install .
     poetry install
     ```
 
-4. Create an .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
+5. Create an .env file and initialise DB connection string env variabled name CNXN_STR.<br/>For the scope of this assessment, sqlite3 is used and CNXN_STR is set to a .db filename (e.g. 'gic.db')<br/>
 
     Powershell:
     ```
@@ -54,21 +60,28 @@ Successful output display should look like the following
 
 ### Invoking Unit Testing
 The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
-```
-pytest
-```
+    ```
+    pytest
+    poetry run python main.py #for poetry 
+    ```
 
 or run individual pytest 
-```
-pytest test/test_extract.py
-pytest test/test_load.py
-pytest test/test_analyse.py
-```
+    ```
+    pytest test/test_extract.py
+    pytest test/test_load.py
+    pytest test/test_analyse.py
+
+    #for poetry
+    poetry run python pytest test/test_extract.py 
+    poetry run python pytest test/test_load.py
+    poetry run python pytest test/test_analyse.py
+    ```
 
 For verbose pytest output for each test case, add -vv arguments
-```
-pytest -vv
-```
+    ```
+    pytest -vv
+    poetry run python pytest -vv #for poetry
+    ```
 
 ## Design Details
 
