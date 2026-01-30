@@ -122,14 +122,22 @@ CSV Outputs
         - date
     - Enriches each extract with these metdata, and writes them to staging partitioned by date sub-directories.
 
+    Output: Extracted funds position in staging directory, partitioned by date 
+    ```data/staging/<YYYY-MM-DD>/<fundname>.csv```
+
 2. Load (`load_data.py`)
     - Reads staged CSVs.
     - Loads data into fund_position table in sqlite DB with a consistent schema.
+
+    Output: Inserted data in sqlite3 DB `fund_position` table
 
 3. Analyse (`analytics.py`)
     - Runs SQL based analytics on 
         - Price reconciliation (available in fund level summary/symbol level breakdown)
         - Best performing fund by month
+    
+    Output: Analysis results exported to analytics directory
+    ```data/analytics/<analysis_name>.csv```
 
 
 ### Detailed Directory Breakdown
@@ -147,7 +155,7 @@ Main entrypoint for the project to perform all operations (initialise, extract, 
 ```
 Each file in this directory is an abstraction of each step in the ETL. 
 > [!NOTE]
-> - This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently
+> - This layer of abstraction is considered with the potential of adding orchestraction layer, and each DAG is able to attach to each operation independently.
 > - E.g. Four Airflow DAGs, each PythonOperator attached to `init_tables.py`, `extract_data.py`, `load_data.py` and `analytics.py`.
 
 #### `data/`
@@ -177,7 +185,7 @@ Each file in this directory is an abstraction of each step in the ETL.
 ```
 Repository of all data files that are involved in the ETL.
 - `data/raw/`: First landing directory of raw fund CSVs.
-- `data/staging/`: Staged files post extaction and processing from extract step. Contains subdirectories partitioned by date in YYYY-MM-DD (for future efficient loading from stage to DB)
+- `data/staging/`: Staged files post extaction and processing from extract step. Contains subdirectories partitioned by date in YYYY-MM-DD (for future efficient loading from stage to DB).
 - `data/analytics/`: Exports of reconciliation analysis between funds vs reference price (summary and symbol level available) and analysis of monthly best performing funds.
 
 #### `sql/`
@@ -226,36 +234,36 @@ Directory containing configuration details such as file naming conventions, data
 ## Assumptions/Scope of take-home submission
 
 1. Incoming Funds Data 
-    - Arrives monthly and consistent as CSV file format
-    - File structure and naming are consistent across months
-    - Filenames will always have EOM date (with year, month, day details) and fund name
+    - Arrives monthly and consistent as CSV file format.
+    - File structure and naming are consistent across months.
+    - Filenames will always have EOM date (with year, month, day details) and fund name.
     - For a given month, each fund only has one csv file. Files are not resent or duped.
 
 2. Reference data
-    - All insturments and symbols in incoming data are available in master reference dataset
-    - Master reference dataset is assumed to be clean and complete for pricing
+    - All insturments and symbols in incoming data are available in master reference dataset.
+    - Master reference dataset is assumed to be clean and complete for pricing.
 
 3. Fund coverage
     - Submission covers the scope for N datasets. 
     - Logic to handle onboarding of new funds beyond the 10 funds in this submission is out of scope.
 
 4. Pricing/Valuation
-    - Utilising most recent available price data, prior to the specified date should there be gaps
+    - Utilising most recent available price data, prior to the specified date should there be gaps.
 
 5. Execution of the solution
-    - Assumed to be run locally without orchestration/scheduling or production deployments
+    - Assumed to be run locally without orchestration/scheduling or production deployments.
 
 ## Potential Future Enhancements/Known Gaps
 1. Extract
-    - Logic to skip erronous file while continuing to extract others
-    - Incremental ingestion and handling
-    - Produce extract report/extract history
+    - Logic to skip erronous file while continuing to extract others.
+    - Incremental ingestion and handling.
+    - Produce extract report/extract history.
 2. Load
-    - Upsert logic to update previously loaded records that changed, insert new records, while ignore unchanged records (currently appends only  logic. Duplicated records expected if identical run)
-    - Load by specific date partitions
+    - Upsert logic to update previously loaded records that changed, insert new records, while ignore unchanged records. (currently appends only  logic. Duplicated records expected if identical run)
+    - Load by specific date partitions.
 3. Analyse
-    - Enhancing to use pandas for further post-SQL query processing
+    - Enhancing to use pandas for further post-SQL query processing.
 4. Others
-    - Logic to continue subsequent steps when previous steps are failing in ```main.py```
-    - Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main()
+    - Logic to continue subsequent steps when previous steps are failing in ```main.py```.
+    - Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main().
     - Unit testing coverage on data quality/query related logic (e.g.results from analytics).
