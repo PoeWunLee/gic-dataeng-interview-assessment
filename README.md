@@ -92,10 +92,10 @@ poetry run python pytest test/test_analyse.py
 ```
 
 For verbose pytest output for each test case, add -vv arguments
-    ```
-    pytest -vv
-    poetry run python pytest -vv
-    ```
+```
+pytest -vv
+poetry run python pytest -vv
+```
 
 ## Design Details
 
