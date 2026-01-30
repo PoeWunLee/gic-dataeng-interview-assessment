@@ -41,7 +41,10 @@ python main.py
 py main.py
 python3 main.py
 ```
-Successful output shou
+Successful output display should look like the following
+
+![alt text](image.png)
+
 ## Unit Testing
 
 > [!NOTE]
@@ -228,4 +231,3 @@ Directory containing configuration details such as file naming conventions, data
     - Logic to continue subsequent steps when previous steps are failing in ```main.py```
     - Option to run only certain operations while not others (e.g. only load) - potentially with command line arguments in main()
     - Unit testing coverage on data quality/query related logic (e.g.results from analytics).
-    - 
