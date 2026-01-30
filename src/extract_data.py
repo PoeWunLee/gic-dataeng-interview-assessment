@@ -5,11 +5,9 @@ import pandas as pd
 from utils.file_utils import extract_csv_to_df, save_df_to_csv, generate_dir
 from utils.metadata_utils import parse_raw_details,enrich_raw_df_with_details, parse_staging_pathname, parse_datetime_format
 
-logging.getLogger(__name__)
-
 def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_config:dict[str,str])->None:
     """Extract raw CSV with metadata enrichment, then save to staging directory"""
-    files_processed=0
+    files_processed=0 #keep track of files processed
     for f in files:
         try:
             #1. extract csv to dataframe

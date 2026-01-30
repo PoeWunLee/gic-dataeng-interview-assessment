@@ -78,7 +78,7 @@ def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_conn
         result=ctx.fetchall()
         cols=[description[0] for description in ctx.description]
 
-    #assert
+    #assert - test columns and records (both enriched fund & datetine metadata) and as-is data from raw align 
     df_from_query = pd.DataFrame(result, columns=cols)
     df_from_csv = pd.read_csv(csv_path)
 

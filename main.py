@@ -82,7 +82,7 @@ def main()->None:
 
     try:
         if not os.path.isfile(CNXN_STR):
-            initialise(path) #initialise if sqlite3 matching CNXN_STR name not found
+            initialise(path) #initialise .db if sqlite3 matching CNXN_STR name not found in root directory
         extract(path)
         load(path)
         analyse(path)

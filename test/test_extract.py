@@ -108,12 +108,15 @@ def test_parse_raw_details(input_filename:str, output:dict[str,str|None]):
 )
 def test_enrich_raw_df_with_details(input_fundname:str, input_date:str, output_results:list[str]):
     """Unit testing key util - enrich fund and datetime details into staging export"""
+    
     #arrange - generate random df
     random_df = pd.DataFrame(["random_value"], columns=["random_col"])
+
     #act
     results_df = enrich_raw_df_with_details(random_df, input_fundname, input_date)
     results_fund = results_df["FUND"].unique()[0]
     results_date = results_df["DATETIME"].unique()[0]
-    #assert
+
+    #assert - metadata correctly populated
     assert [results_fund, results_date]==output_results
 
