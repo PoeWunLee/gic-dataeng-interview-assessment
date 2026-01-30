@@ -75,21 +75,23 @@ The pytest suite is used for this submisison. To invoke pytest, simply run in ro
 ```
 pytest
 ```
+in poetry syntax
 ```
 poetry run python pytest
 ```
 
 or run individual pytest 
-    ```
-    pytest test/test_extract.py
-    pytest test/test_load.py
-    pytest test/test_analyse.py
-    ```
-    ```
-    poetry run python pytest test/test_extract.py 
-    poetry run python pytest test/test_load.py
-    poetry run python pytest test/test_analyse.py
-    ```
+```
+pytest test/test_extract.py
+pytest test/test_load.py
+pytest test/test_analyse.py
+```
+in poetry syntax
+```
+poetry run python pytest test/test_extract.py 
+poetry run python pytest test/test_load.py
+poetry run python pytest test/test_analyse.py
+```
 
 For verbose pytest output for each test case, add -vv arguments
     ```
