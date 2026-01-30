@@ -72,12 +72,12 @@ Successful output display should look like the following
 
 ### Invoking Unit Testing
 The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
-    ```
-    pytest
-    ```
-    ```
-    poetry run python pytest
-    ```
+```
+pytest
+```
+```
+poetry run python pytest
+```
 
 or run individual pytest 
     ```
