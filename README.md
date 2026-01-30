@@ -121,22 +121,19 @@ CSV Outputs
         - fund name
         - date
     - Enriches each extract with these metdata, and writes them to staging partitioned by date sub-directories.
-
-    Output: Extracted funds position in staging directory, partitioned by date 
+    - Output: Extracted funds position in staging directory, partitioned by date</br>
     ```data/staging/<YYYY-MM-DD>/<fundname>.csv```
 
 2. Load (`load_data.py`)
     - Reads staged CSVs.
     - Loads data into fund_position table in sqlite DB with a consistent schema.
-
-    Output: Inserted data in sqlite3 DB `fund_position` table
+    - Output: Inserted data in sqlite3 DB `fund_position` table
 
 3. Analyse (`analytics.py`)
     - Runs SQL based analytics on 
         - Price reconciliation (available in fund level summary/symbol level breakdown)
         - Best performing fund by month
-    
-    Output: Analysis results exported to analytics directory
+    - Output: Analysis results exported to analytics directory</br>
     ```data/analytics/<analysis_name>.csv```
 
 
