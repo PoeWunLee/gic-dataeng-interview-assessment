@@ -10,13 +10,12 @@ This code repository is a submission for GIC Data Engineer take-home assessment.
 2. Navigate to the root directory (~/gic-dataeng-interview-assessment)
     ```
     cd gic-dataeng-interview-assessment
-
     ```
 
 3. (Optional) initialise and activate a virtual environment
     ```
-        python -m venv .venv
-        .venv/Scripts/activate
+    python -m venv .venv
+    .venv/Scripts/activate
     ```
 
 4. Install required dependencies and packages from pyproject.toml (pip or poetry)
