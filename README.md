@@ -74,7 +74,9 @@ Successful output display should look like the following
 The pytest suite is used for this submisison. To invoke pytest, simply run in root directory (~/gic-dataeng-interview-assessment)
     ```
     pytest
-    poetry run python main.py #for poetry 
+    ```
+    ```
+    poetry run python pytest
     ```
 
 or run individual pytest 
@@ -82,8 +84,8 @@ or run individual pytest
     pytest test/test_extract.py
     pytest test/test_load.py
     pytest test/test_analyse.py
-
-    #for poetry
+    ```
+    ```
     poetry run python pytest test/test_extract.py 
     poetry run python pytest test/test_load.py
     poetry run python pytest test/test_analyse.py
@@ -92,7 +94,7 @@ or run individual pytest
 For verbose pytest output for each test case, add -vv arguments
     ```
     pytest -vv
-    poetry run python pytest -vv #for poetry
+    poetry run python pytest -vv
     ```
 
 ## Design Details
