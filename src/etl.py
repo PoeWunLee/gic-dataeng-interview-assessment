@@ -11,6 +11,7 @@ from config.file_configs import PARSE_RAW_DETAILS_CONFIG, RAW_FILENAME_EXT, STAG
 from config.db_configs import INIT_DB_SCRIPTS, FUND_TABLE_NAME
 from config.analytics_configs import ANALYTICS_INPUT_OUTPUT_DICT
 
+#load utils
 from utils.file_utils import get_files
 
 class PipelineStatus:
