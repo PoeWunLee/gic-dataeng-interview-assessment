@@ -14,6 +14,24 @@ def generate_dir(filepath:Path) -> None:
         os.makedirs(filepath, exist_ok=True)
     return
 
+#parsing paths
+def get_paths(root_path:Path)->dict[str,Path]:
+    """Parse all paths in a dictionary to be passed into each pipeline step"""
+    directories = {
+        "root":root_path,
+        "raw":root_path / "data" / "raw",
+        "staging":root_path / "data" / "staging",
+        "sql":root_path / "sql",
+        "analytics":root_path / "data" / "analytics",
+        "config":root_path / "config"
+    }
+
+    #initialise directories if doesn't exist
+    for d in directories.values():
+        generate_dir(d)
+    
+    return directories
+
 ##CSV##
 def extract_csv_to_df(filename:str)->pd.DataFrame|None:
     """Parse CSV rows to dataframe format"""

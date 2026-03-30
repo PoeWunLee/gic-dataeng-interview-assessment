@@ -6,8 +6,9 @@ from utils.file_utils import save_df_to_csv, extract_sql_from_file
 import logging
 logging.getLogger(__name__)
 
-def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path)->None:
+def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path)->int|None:
     """Generated analysis from SQL query and export to CSV"""
+    processed_analyses=0 #keep track of analyses executed
     for analysis, in_out_map in config_dict.items():
         for sql_file, csv_export_file in in_out_map.items():
             try:
@@ -33,5 +34,6 @@ def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Pat
                 raise
 
         logging.info(f"{analysis} analysis completed. Exported results to {list(in_out_map.values())}.")
+        processed_analyses +=1
     
-    return
+    return processed_analyses

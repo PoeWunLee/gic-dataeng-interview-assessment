@@ -6,7 +6,7 @@ from utils.db_utils import insert_df_to_db, init_db_connect
 
 logging.getLogger(__name__)
 
-def load_funds(cnxn_str:str,files:Generator, destination_table:str)->None:
+def load_funds(cnxn_str:str,files:Generator, destination_table:str)->int|None:
     """Load raw CSV into funds table within the same date path"""
     try:
         #1. load respective csvs into dfs. compile all staged into single df
@@ -18,10 +18,12 @@ def load_funds(cnxn_str:str,files:Generator, destination_table:str)->None:
         #2. insert compiled df into table
         with init_db_connect(cnxn_str) as cnxn:
             insert_df_to_db(dfs_staged, cnxn, destination_table)
-        logging.info(f"Loaded {len(dfs_staged)} records into database table {destination_table}.")
-        
+
     except Exception:
         logging.exception(f"Load to database table {destination_table} failed.", exc_info=True)
         raise
-    
-    return
+
+    rows_loaded= len(dfs_staged)
+    logging.info(f"Loaded {rows_loaded} records into database table {destination_table}.")
+
+    return rows_loaded

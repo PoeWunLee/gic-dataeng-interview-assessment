@@ -20,7 +20,7 @@ def init_tables(cnxn_str:str,init_db_configs:dict[str,str], root_sql_path:Path)-
                 execute_sql_to_db(sql, cnxn, is_bulk_ingest=True)
                 
         except Exception:
-            logging.exception("Failed to initialise database and tables.", exc_info=True)
+            logging.exception(f"Failed to initialise database and tables. SQL Script failed: {sql_file_path}", exc_info=True)
             raise
     
     logging.info("Initialised all database and tables.")
