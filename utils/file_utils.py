@@ -6,7 +6,7 @@ import os
 ##Generic##
 def get_files(dir:Path, ext:str)->Generator:
     "Retrieve all files of a particular extension in a directory path recursively"
-    return dir.rglob(ext)
+    return list(dir.rglob(ext))
 
 def generate_dir(filepath:Path) -> None:
     """Generate directory if does not exist. If exists, exception not raised"""

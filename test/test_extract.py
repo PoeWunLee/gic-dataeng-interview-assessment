@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
-from utils.metadata_utils import parse_raw_details, enrich_raw_df_with_details
-from config.file_configs import PARSE_RAW_DETAILS_CONFIG
+from utils.metadata_utils import parse_raw_details,parse_staging_pathname ,enrich_raw_df_with_details
+from config.configs import PARSE_RAW_DETAILS_CONFIG
 from src.extract_data import extract_raw_to_stage
 import pandas as pd
 
