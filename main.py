@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from utils.file_utils import get_paths
 from utils.log_utils import init_logger
 from utils.config_utils import InitialiseConfigs, ExtractConfigs, LoadConfigs, AnalyticsConfigs, ConfigsParser
+from utils.cli_utils import get_cli_arguments
 
 #load configs
 from config.configs import PARSE_RAW_DETAILS_CONFIG, RAW_FILENAME_EXT, STAGING_FILENAME_EXT, INIT_DB_SCRIPTS, FUND_TABLE_NAME, ANALYTICS_INPUT_OUTPUT_DICT
@@ -17,14 +18,11 @@ from src.etl import PipelineRun
 def main()->None:
     """Main entrypoint function to run extract, stage, load, analyse steps"""
     
-    #initialising logger
+    #initialising - logger, root path references, connection strings
     init_logger()
-
-    #root paths and respective directory dict
+    
     ROOT=Path(__file__).parent.absolute() 
     path=get_paths(ROOT)
-
-    #get env vars
     load_dotenv(ROOT/".env")
     CNXN_STR = os.getenv("CNXN_STR")
 
@@ -33,7 +31,8 @@ def main()->None:
         raise ValueError("Please insert valid DB connection string/sqlite3 .db in environment variables")
 
     #flags for extract, load, analyse
-    is_extract, is_load, is_analyse= True, True, True
+    is_extract, is_load, is_analyse= get_cli_arguments()
+    logging.info("{} {} {}".format(is_extract, is_load, is_analyse))
 
     #initialise flag set to true if sqlite and if env var does not have cnxn str
     is_initialise = ".db" in CNXN_STR and not os.path.isfile(CNXN_STR)

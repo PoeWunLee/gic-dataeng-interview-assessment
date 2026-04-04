@@ -4,6 +4,7 @@ from utils.file_utils import get_paths, generate_dir
 import shutil
 from pathlib import Path
 from utils.config_utils import InitialiseConfigs, ExtractConfigs, AnalyticsConfigs, LoadConfigs, ConfigsParser
+from utils.cli_utils import get_cli_arguments
 
 @pytest.fixture
 def make_paths(tmp_path:Path):
@@ -106,7 +107,6 @@ def test_pipeline_funcs(input_args: dict[str, bool],
     
     configs = make_configs
     cnxn_str = paths["root"] / "test.db"
-
 
     #act
     pipeline=PipelineRun(configs,input_args['init'], input_args['extract'], input_args['load'], input_args['analyse'])
