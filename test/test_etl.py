@@ -95,7 +95,8 @@ def test_etl(input_fundname,input_date,output_status, tmp_path, make_configs):
             ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31-08-2025', {"extract":2, "load":1,"analyse":1}),
             ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31/08/2025', {"extract":2, "load":1,"analyse":1}),
             ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], ['31/08/2025', '20260228'], {"extract":2, "load":2,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['31/08/2025', '20260228'], {"extract":3, "load":2,"analyse":1})
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['31/08/2025', '20260228'], {"extract":3, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['2027-09-30'], {"extract":3, "load":0,"analyse":1})
         ]
 )
 def test_etl_date_load(input_fundname_datetime,input_target_date,output_status, tmp_path, make_configs):
@@ -139,8 +140,5 @@ def test_etl_date_load(input_fundname_datetime,input_target_date,output_status, 
     status = pipeline.run(target_date=input_target_date)
 
     expected_output = PipelineStatus(output_status["extract"], output_status["load"], output_status["analyse"]) 
-    
 
     assert status==expected_output
-    # assert status.loaded_status[0]==output_status["load"][0]
-    # assert status.analyse_status[0]==output_status["analyse"][0]

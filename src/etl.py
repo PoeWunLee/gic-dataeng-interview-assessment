@@ -64,17 +64,19 @@ class PipelineRun:
     def load(self, target_date:str|list[str]|None=None):
         """Load step - from staging directory -> sqlite. Assumption - input target_date comes in either list of strings, stings or None"""
         logging.info("STARTED: [LOAD]")
-        
+
+        #initialised loaded_count
+        loaded_count=0
         search_dir = [self.paths.get("staging")] #convert to string for coherence of for loop in the later portions
-        if target_date:
-            if isinstance(target_date, str):
-                target_date_formatted = parse_datetime_format(target_date) #clean possible datetime formats
-                search_dir = [self.paths.get("staging")/target_date_formatted]
-            elif isinstance(target_date, list):
-                search_dir = [self.paths.get("staging")/parse_datetime_format(td) for td in target_date] #clean possible datetime formats
-            
+
         try:
-            loaded_count=0
+            if target_date:
+                if isinstance(target_date, str):
+                    target_date_formatted = parse_datetime_format(target_date) #clean possible datetime formats
+                    search_dir = [self.paths.get("staging")/target_date_formatted]
+                elif isinstance(target_date, list):
+                    search_dir = [self.paths.get("staging")/parse_datetime_format(td) for td in target_date] #clean possible datetime formats
+
             for sd in search_dir:
                 staged_files = get_files(dir=sd, ext=self.load_configs.staging_filename_ext)
                 logging.info("Loading into DB from directory: {}".format(sd))
@@ -84,7 +86,7 @@ class PipelineRun:
                                         )
         except Exception as e:
             logging.exception("Failed to load. {}".format(e))
-            return 0
+            return loaded_count
         logging.info("COMPLETED: [LOAD]\n")
 
         return loaded_count

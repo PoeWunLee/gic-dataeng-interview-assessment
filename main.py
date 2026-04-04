@@ -25,27 +25,27 @@ def main()->None:
     
     #load environment variables
     load_dotenv()
-    CNXN_STR = os.getenv("CNXN_STR")
     root = Path(__file__).parent.absolute()
 
     #initialise logging configs
     init_logger()
+
     #initialise paths
     path=get_paths(root)
     configs=parse_configs()
-    cnxn_str = configs.init_configs.cnxn_str
-
+    cnxn_str = configs.init_configs.cnxn_str #get cnxn string for checking
 
     #ensure .env file has CNXN_STR - sqlite3
     if not cnxn_str:
         raise ValueError("Please insert valid DB connection string/sqlite3 .db in environment variables")
 
     is_init=False
-    if not os.path.isfile(cnxn_str):
+    if ".db" in cnxn_str and not os.path.isfile(cnxn_str):
         is_init=True #initialise .db if sqlite3 matching CNXN_STR name not found in root directory
+    
     try:
         pipeline = PipelineRun(configs,path,is_init)
-        status = pipeline.run()
+        status = pipeline.run(target_date=["2023-02-28", "2022-10-31"])
 
     except Exception:
         logging.exception("Pipeline run failed.")
