@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import argparse
 #load configs
 from configs import CNXN_STR,ANALYTICS_INPUT_OUTPUT_DICT,INIT_DB_SCRIPTS, FUND_TABLE_NAME,PARSE_RAW_DETAILS_CONFIG, RAW_FILENAME_EXT, STAGING_FILENAME_EXT
 
@@ -48,3 +49,15 @@ def parse_configs():
     configs = Configs(init_configs, extract_configs, load_configs, analyse_configs)
 
     return configs
+
+def parse_cli_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--extract", action="store_true")
+    parser.add_argument("-l", "--load", action="store_true")
+    parser.add_argument("-a", "--analyse", action="store_true")
+    parser.add_argument("-d", "--dates", nargs="*")
+    parser.add_argument("-f", "--funds", nargs="*")
+    args = parser.parse_args()
+
+    return args.extract, args.load, args.analyse, args.dates, args.funds
+    

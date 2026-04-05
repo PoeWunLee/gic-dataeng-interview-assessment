@@ -5,8 +5,10 @@ import logging
 
 logging.getLogger(__name__)
 
-def init_tables(cnxn_str:str,init_db_configs:dict[str,str], root_sql_path:Path)->None:
+def init_tables(cnxn_str:str,init_db_configs:dict[str,str], root_sql_path:Path)->int|None:
     """Running sql DDL to initialise tables required in database."""
+    init_table_count=0
+
     for sql_file_path in init_db_configs.values():
         #1. obtain absolute path
         sql_full_path = root_sql_path / sql_file_path
@@ -18,11 +20,13 @@ def init_tables(cnxn_str:str,init_db_configs:dict[str,str], root_sql_path:Path)-
             #3. execute DDL commands
             with init_db_connect(cnxn_str) as cnxn:
                 execute_sql_to_db(sql, cnxn, is_bulk_ingest=True)
-                
+    
+            init_table_count +=1
+
         except Exception:
             logging.exception("Failed to initialise database and tables.", exc_info=True)
             raise
     
-    logging.info("Initialised all database and tables.")
+    logging.info("Initialised all databases and {} SQL DDL.".format(init_table_count))
 
-    return
+    return init_table_count

@@ -4,10 +4,10 @@ from src.extract_data import extract_raw_to_stage
 from src.load_data import load_funds
 from src.init_tables import init_tables
 from src.analytics import analyse_data
-from src.etl import PipelineRun, PipelineStatus
+from src.etl import PipelineRun, PipelineStatus, PipelineOptions
 
 from utils.configs_utils import Configs, InitialiseConfigs, ExtractConfigs, LoadConfigs, AnalyseConfigs
-from utils.file_utils import get_paths
+from utils.file_utils import get_paths, generate_dir
 
 @pytest.fixture
 def make_configs():
@@ -36,13 +36,20 @@ def make_configs():
 
 @pytest.mark.parametrize(
 
-        "input_fundname,input_date,output_status",
+        "input_etl_run_options,input_fundname,input_date,output_status",
         [
-            ("RandomFundname", "2025-08-31", {"extract":1, "load":1,"analyse":1})
+            ({"init":True,"extract":True, "load":True, "analyse":True},"RandomFundname", "2025-08-31", {"init":1,"extract":1, "load":1,"analyse":1}),
+            ({"init":True,"extract":False, "load":False, "analyse":False},"RandomFundname", "2025-08-31", {"init":1,"extract":0, "load":0,"analyse":0}),
+            ({"init":True,"extract":True, "load":False, "analyse":False},"RandomFundname", "2025-08-31", {"init":1,"extract":1, "load":0,"analyse":0}),
+            ({"init":True,"extract":False, "load":True, "analyse":False},"RandomFundname", "2025-08-31", {"init":1,"extract":0, "load":1,"analyse":0}),
+            ({"init":True,"extract":False, "load":False, "analyse":True},"RandomFundname", "2025-08-31", {"init":1,"extract":0, "load":0,"analyse":1}),
+            ({"init":True,"extract":True, "load":True, "analyse":False},"RandomFundname", "2025-08-31", {"init":1,"extract":1, "load":1,"analyse":0}),
+            ({"init":True,"extract":True, "load":False, "analyse":True},"RandomFundname", "2025-08-31", {"init":1,"extract":1, "load":0,"analyse":1}),
+            ({"init":True,"extract":False, "load":True, "analyse":True},"RandomFundname", "2025-08-31", {"init":1,"extract":0, "load":1,"analyse":1})
         
         ]
 )
-def test_etl(input_fundname,input_date,output_status, tmp_path, make_configs):
+def test_etl(input_etl_run_options,input_fundname,input_date,output_status, tmp_path, make_configs):
     #arrange
     configs=make_configs
     paths = get_paths(tmp_path)
@@ -75,9 +82,28 @@ def test_etl(input_fundname,input_date,output_status, tmp_path, make_configs):
     with open(paths["sql"]/'test_analyse.sql','w') as f:
         f.write("SELECT 1;")
 
+    #4. in the case where extract is not run, create dummy staging file
+    if not(input_etl_run_options["extract"]) and input_etl_run_options["load"]:
+        #sub-dir
+        staging_dir = paths["staging"]/"{}".format(input_date)
+
+        #make sub directory
+        generate_dir(staging_dir)
+
+        with open(staging_dir/"{}.csv".format(input_fundname.upper()), 'w') as f:
+            f.write("FINANCIAL TYPE,SYMBOL,SECURITY NAME,SEDOL,PRICE,QUANTITY,REALISED P/L,MARKET VALUE,FUND,DATETIME\nEquities,HSIC,Henry Schein,,81.1,8508.375294889569,396.05327610977776,690029.236415544,{},{}".format(input_fundname, input_date))
+
     #initialisation of files etc
-    pipeline = PipelineRun(configs, paths, is_init=True)
-    status = pipeline.run(target_date=input_date)
+    run_options = PipelineOptions(
+        is_init=input_etl_run_options["init"],
+        is_extract=input_etl_run_options["extract"],
+        is_load=input_etl_run_options["load"],
+        is_analyse=input_etl_run_options["analyse"] 
+    )
+    pipeline = PipelineRun(run_options=run_options,configs=configs, paths=paths)
+    status = pipeline.run(target_date=input_date, target_fund=input_fundname)
+
+    assert status.init_status==output_status["init"]
     assert status.extract_status==output_status["extract"]
     assert status.loaded_status==output_status["load"]
     assert status.analyse_status==output_status["analyse"]
@@ -87,16 +113,16 @@ def test_etl(input_fundname,input_date,output_status, tmp_path, make_configs):
 
         "input_fundname_datetime,input_target_date,output_status",
         [
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2026-02-28', {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2025-08-31', {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2025-09-30', {"extract":2, "load":0,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], None, {"extract":2, "load":2,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '20250831', {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31-08-2025', {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31/08/2025', {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], ['31/08/2025', '20260228'], {"extract":2, "load":2,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['31/08/2025', '20260228'], {"extract":3, "load":2,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['2027-09-30'], {"extract":3, "load":0,"analyse":1})
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2026-02-28', {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2025-08-31', {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '2025-09-30', {"init":1,"extract":2, "load":0,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], None, {"init":1,"extract":2, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '20250831', {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31-08-2025', {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], '31/08/2025', {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], ['31/08/2025', '20260228'], {"init":1,"extract":2, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['31/08/2025', '20260228'], {"init":1,"extract":3, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"], ["RandomFundname", "20230226"]], ['2027-09-30'], {"init":1,"extract":3, "load":0,"analyse":1})
         ]
 )
 def test_etl_date_load(input_fundname_datetime,input_target_date,output_status, tmp_path, make_configs):
@@ -135,27 +161,30 @@ def test_etl_date_load(input_fundname_datetime,input_target_date,output_status, 
         with open(paths["sql"]/'test_analyse.sql','w') as f:
             f.write("SELECT 1;")
 
-    #assert
-    pipeline = PipelineRun(configs, paths, is_init=True)
+    #act
+    run_options = PipelineOptions(is_init=True,is_extract=True,is_load=True,is_analyse=True)
+    pipeline = PipelineRun(run_options=run_options,configs=configs, paths=paths)
     status = pipeline.run(target_date=input_target_date)
 
-    expected_output = PipelineStatus(output_status["extract"], output_status["load"], output_status["analyse"]) 
+    assert status.init_status==output_status["init"]
+    assert status.extract_status==output_status["extract"]
+    assert status.loaded_status==output_status["load"]
+    assert status.analyse_status==output_status["analyse"]
 
-    assert status==expected_output
 @pytest.mark.parametrize(
 
         "input_fundname_datetime,input_target_fund,output_status",
         [
       
-            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], None, {"extract":2, "load":2,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "SomeOtherFundname", {"extract":2, "load":1,"analyse":1}), #-
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "RandomFundname", {"extract":2, "load":1,"analyse":1}), #-
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundNameExample", {"extract":2, "load":0,"analyse":1}), #-
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "randomfundname", {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundnameNotRegisteredInConfig", {"extract":2, "load":0,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["FundnameNotRegisteredInConfig"], {"extract":2, "load":0,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["someotherfundname","FundnameNotRegisteredInConfig"], {"extract":2, "load":1,"analyse":1}),
-            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["randomfundname","SOMEOTHERFUNDNAME"], {"extract":2, "load":2,"analyse":1})
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], None, {"init":1,"extract":2, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "SomeOtherFundname", {"init":1,"extract":2, "load":1,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "RandomFundname", {"init":1,"extract":2, "load":1,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundNameExample", {"init":1,"extract":2, "load":0,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "randomfundname", {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundnameNotRegisteredInConfig", {"init":1,"extract":2, "load":0,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["FundnameNotRegisteredInConfig"], {"init":1,"extract":2, "load":0,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["someotherfundname","FundnameNotRegisteredInConfig"], {"init":1,"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["randomfundname","SOMEOTHERFUNDNAME"], {"init":1,"extract":2, "load":2,"analyse":1})
         ]
 )
 def test_etl_fundname_load(input_fundname_datetime,input_target_fund,output_status, tmp_path, make_configs):
@@ -195,9 +224,11 @@ def test_etl_fundname_load(input_fundname_datetime,input_target_fund,output_stat
             f.write("SELECT 1;")
 
     #assert
-    pipeline = PipelineRun(configs, paths, is_init=True)
+    run_options = PipelineOptions(is_init=True,is_extract=True,is_load=True,is_analyse=True)
+    pipeline = PipelineRun(run_options=run_options,configs=configs, paths=paths)
     status = pipeline.run(target_fund=input_target_fund)
 
-    expected_output = PipelineStatus(output_status["extract"], output_status["load"], output_status["analyse"]) 
-
-    assert status==expected_output
+    assert status.init_status==output_status["init"]
+    assert status.extract_status==output_status["extract"]
+    assert status.loaded_status==output_status["load"]
+    assert status.analyse_status==output_status["analyse"]

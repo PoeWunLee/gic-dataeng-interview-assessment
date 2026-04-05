@@ -15,35 +15,42 @@ from dataclasses import dataclass
 
 @dataclass
 class PipelineStatus:
+    init_status:int=0
     extract_status:int=0
     loaded_status:int=0
     analyse_status:int=0
 
-class RunConfigs:
-    fund_name:str=""
-    date:str=""
+@dataclass
+class PipelineOptions:
+    is_init:bool=True #by default initialise when detected there is no .db file in root
+    is_extract:bool=True
+    is_load:bool=True
+    is_analyse:bool=True
 
 class PipelineRun:
-    def __init__(self, configs:Configs, paths:dict[str,Path],is_init:bool=False):
+    def __init__(self, run_options:PipelineOptions,configs:Configs,paths:dict[str,Path]):
         #configs
-        self.configs=Configs
+        self.configs=configs
         self.init_configs=configs.init_configs
         self.extract_configs=configs.extract_configs
         self.load_configs=configs.load_configs
         self.analyse_configs = configs.analyse_configs
+        #run options
+        self.run_options=run_options
         self.paths = paths
-        self.is_init = is_init
     
     #wrapper for each step
     def initialise(self):
         """Initialise DB and required tables (bond and equity references, bond and equity price, fund position)"""
         logging.info("STARTED: [INITALISE]")
-        init_tables(
+        init_table_count = init_tables(
             self.init_configs.cnxn_str,
             init_db_configs=self.init_configs.init_db_scripts, 
             root_sql_path=self.paths.get("sql")
         )
         logging.info("COMPLETED: [INITALISE]\n")
+
+        return init_table_count
 
     def extract(self):
         """Extract step - from raw -> staging directory"""
@@ -124,17 +131,32 @@ class PipelineRun:
         return analysis_count
 
     def run(self, target_date:str|list[str]|None=None, target_fund:str|list[str]|None=None):
+        
         #initialise pipeline status
-        status=PipelineStatus()
-        if self.is_init:
-            self.initialise()
+        init_status,extract_status, loaded_status,analyse_status=0,0,0,0
 
-        extract_status = self.extract()
-        loaded_status = self.load(target_date, target_fund)
-        analyse_status = self.analyse()
+        if self.run_options.is_init:
+            init_status = self.initialise()
 
-        logging.info("Extracted:{} files Loaded:{} rows Analysis outputs:{} files".format(extract_status, loaded_status, analyse_status))
-        status=PipelineStatus(extract_status,loaded_status,analyse_status)
+        if self.run_options.is_extract:
+            extract_status = self.extract()
+        
+        if self.run_options.is_load:
+            loaded_status = self.load(target_date, target_fund)
+        
+        if self.run_options.is_analyse:
+            analyse_status = self.analyse()
+
+        status=PipelineStatus(init_status,extract_status,loaded_status,analyse_status)
+
+        logging.info("Initialised:{} tables | Extracted:{} files | Loaded:{} rows | Analysis outputs:{} files"\
+                    .format(
+                        status.init_status,
+                        status.extract_status, 
+                        status.loaded_status, 
+                        status.analyse_status
+                    )
+        )
         
         return status
 
