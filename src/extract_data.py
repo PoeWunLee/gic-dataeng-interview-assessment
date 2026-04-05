@@ -22,7 +22,7 @@ def extract_raw_to_stage(files:list[Path], dest_root_path:Path, raw_details_conf
 
             #4. save enriched dataframe to staging file directories by month
             stage_file_dir, staged_file_name = parse_staging_pathname(dest_root_path,fund_name, date_time)
-            logging.info("Staged file name {}".format(staged_file_name))
+            
             #5. Export and stage file
             generate_dir(stage_file_dir) #generate date directory if does not exist
             save_df_to_csv(enriched_df, staged_file_name)

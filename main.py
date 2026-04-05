@@ -45,7 +45,7 @@ def main()->None:
     
     try:
         pipeline = PipelineRun(configs,path,is_init)
-        status = pipeline.run(target_date=["2023-02-28", "2022-10-31"])
+        status = pipeline.run(target_date=["2023-02-28", "2022-10-31"], target_fund=["applebead", "belaware", "magnum"])
 
     except Exception:
         logging.exception("Pipeline run failed.")

@@ -56,24 +56,24 @@ def filter_dates_to_load(target_date:str|list[str], staging_path:Path)->list[Pat
         if not staging_date_path.is_dir():
             logging.exception("Staging directory for given date {} does not exist. Extract specified date first.".format(staging_date_path))
             return []
-        search_dir = [staging_date_path]
+        search_dates = [staging_date_path]
     elif isinstance(target_date, list):
         target_date_dirs = []
-        search_dir = []
+        search_dates = []
         for td in target_date:
             staging_date_path = staging_path/parse_datetime_format(td)
             target_date_dirs += [staging_date_path]
             if staging_date_path.is_dir():
-                search_dir += [staging_date_path]
+                search_dates += [staging_date_path]
 
-        ineligible_dates = set(target_date_dirs) - set(search_dir)
-        if len(search_dir)==0:
+        ineligible_dates = set(target_date_dirs) - set(search_dates)
+        if len(search_dates)==0:
             logging.exception("All dates specified are ineligible {} and not staged. Skipping load step...".format(ineligible_dates))
             return []
         if len(ineligible_dates) > 0:
             logging.info("Skipping ineligible dates {}. Stage raw files from dates first.".format(ineligible_dates))
         
-    return search_dir
+    return search_dates
 
 def filter_funds_to_load(target_fund:str|list[str], eligible_fundnames:str,file_ext:str)->list[str]|None:
     """Utility to filter fund names to load into DB"""

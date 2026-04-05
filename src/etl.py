@@ -73,25 +73,28 @@ class PipelineRun:
         staging_path = self.paths.get("staging")
 
         #placeholder - default values if no date or fund filters specified
-        search_dir = [self.paths.get("staging")] #placeholder variable. default if no date is chosen.
+        search_dates = [self.paths.get("staging")] #placeholder variable. default if no date is chosen.
         search_fund = None #placeholder variable. default if no date is chosen.
         staged_files_to_load = []
 
         try:
             #date filter
             if target_date:
-                search_dir = filter_dates_to_load(target_date=target_date, staging_path=staging_path)
+                search_dates = filter_dates_to_load(target_date=target_date, staging_path=staging_path)
+                if len(search_dates)==0:
+                    return loaded_count
+                logging.info("Dates to be loaded in to DB:{}".format(search_dates))
 
             #fund filter
             if target_fund:
                 search_fund = filter_funds_to_load(target_fund=target_fund, eligible_fundnames=eligible_fundnames, file_ext=file_ext)
                 if len(search_fund)==0:
                     return loaded_count
+                logging.info("Funds to be loaded in to DB:{}".format(search_fund))
             
-            for sd in search_dir:
+            for sd in search_dates:
                 staged_files_to_load += get_files(dir=sd, ext=file_ext, filter_files=search_fund)
             
-            logging.info("Loading into DB from directory: {}/{}".format(staged_files_to_load, staged_files_to_load))
             loaded_count += load_funds(self.load_configs.cnxn_str,
                                     staged_files_to_load, 
                                     self.load_configs.fund_table_name
