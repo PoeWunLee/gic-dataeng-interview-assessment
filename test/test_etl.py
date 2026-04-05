@@ -15,7 +15,7 @@ def make_configs():
     raw_filename_ext = "*.csv"
     staging_filename_ext="*.csv"
     parse_raw_details_config = {
-        "fund_name":"RandomFundname" ,
+        "fund_name":"randomfundname|someotherfundname|fundnamexample" ,
         "date_time":r"\d{8}|\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4}|\d{2}_\d{2}_\d{4}|\d{4}_\d{2}_\d{2}"
     }
     fund_table_name = "test_table"
@@ -138,6 +138,65 @@ def test_etl_date_load(input_fundname_datetime,input_target_date,output_status, 
     #assert
     pipeline = PipelineRun(configs, paths, is_init=True)
     status = pipeline.run(target_date=input_target_date)
+
+    expected_output = PipelineStatus(output_status["extract"], output_status["load"], output_status["analyse"]) 
+
+    assert status==expected_output
+@pytest.mark.parametrize(
+
+        "input_fundname_datetime,input_target_fund,output_status",
+        [
+      
+            ([["RandomFundname", "2025-08-31"], ["RandomFundname", "2026-02-28"]], None, {"extract":2, "load":2,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "SomeOtherFundname", {"extract":2, "load":1,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "RandomFundname", {"extract":2, "load":1,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundNameExample", {"extract":2, "load":0,"analyse":1}), #-
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "randomfundname", {"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], "FundnameNotRegisteredInConfig", {"extract":2, "load":0,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["FundnameNotRegisteredInConfig"], {"extract":2, "load":0,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["someotherfundname","FundnameNotRegisteredInConfig"], {"extract":2, "load":1,"analyse":1}),
+            ([["RandomFundname", "2025-08-31"], ["SomeOtherFundname", "2026-02-28"]], ["randomfundname","SOMEOTHERFUNDNAME"], {"extract":2, "load":2,"analyse":1})
+        ]
+)
+def test_etl_fundname_load(input_fundname_datetime,input_target_fund,output_status, tmp_path, make_configs):
+    #arrange
+    paths = get_paths(tmp_path)
+    configs=make_configs
+
+    #create tmp files
+    for inputs in input_fundname_datetime:
+        input_fundname, input_date = inputs[0], inputs[1]
+
+        # 1. raw file
+        with open(paths['raw']/f'{input_fundname}_{input_date}.csv','w') as f:
+            f.write("FINANCIAL TYPE,SYMBOL,SECURITY NAME,SEDOL,PRICE,QUANTITY,REALISED P/L,MARKET VALUE\nEquities,HSIC,Henry Schein,,81.1,8508.375294889569,396.05327610977776,690029.236415544")
+
+        #2. init sql table scripts
+        with open(paths["sql"]/f'{configs.load_configs.fund_table_name}.sql','w') as f:
+            f.write(f"""BEGIN TRANSACTION;
+            DROP TABLE IF EXISTS "{configs.load_configs.fund_table_name}";
+            CREATE TABLE IF NOT EXISTS "{configs.load_configs.fund_table_name}" (
+                "FINANCIAL TYPE"    TEXT,
+                "SYMBOL"    TEXT,
+                "SECURITY NAME" TEXT,
+                "SEDOL" TEXT,
+                "ISIN" TEXT,
+                "PRICE" REAL,
+                "QUANTITY" REAL,
+                "REALISED P/L" REAL,
+                "MARKET VALUE" REAL,
+                "FUND" TEXT,
+                "DATETIME" TEXT
+            );
+            COMMIT;""")
+
+        #3 . init sql analyses scripts
+        with open(paths["sql"]/'test_analyse.sql','w') as f:
+            f.write("SELECT 1;")
+
+    #assert
+    pipeline = PipelineRun(configs, paths, is_init=True)
+    status = pipeline.run(target_fund=input_target_fund)
 
     expected_output = PipelineStatus(output_status["extract"], output_status["load"], output_status["analyse"]) 
 

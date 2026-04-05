@@ -52,16 +52,16 @@ def make_staging(tmp_path:Path, input_date_partition:str,input_fund_csv:str):
 @pytest.mark.parametrize(
         "input_date_partition, input_fund_csv",
         [
-            ("2022-01-31","Applebead.csv"),
-            ("2023-08-31","Belaware.csv"),
-            ("2022-11-30","Catalysm.csv"),
-            ("2023-02-28","Gohen.csv"),
-            ("2025-06-30","Leeder.csv"),
-            ("2024-05-31","Magnum.csv"),
-            ("2024-04-30","Trustmind.csv"),
-            ("2024-07-31","Virtous.csv"),
-            ("2021-10-30","Wallington.csv"),
-            ("2019-03-31","Whitestone.csv")
+            ("2022-01-31","APPLEBEAD.csv"),
+            ("2023-08-31","BELAWARE.csv"),
+            ("2022-11-30","CATALYSM.csv"),
+            ("2023-02-28","GOHEN.csv"),
+            ("2025-06-30","LEEDER.csv"),
+            ("2024-05-31","MAGNUM.csv"),
+            ("2024-04-30","TRUSTMIND.csv"),
+            ("2024-07-31","VIRTOUS.csv"),
+            ("2021-10-30","WALLINGTON.csv"),
+            ("2019-03-31","WHITESTONE.csv")
         ]
 )
 def test_load_funds(input_date_partition, input_fund_csv, make_staging,make_connection, tmp_path):

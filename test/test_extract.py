@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
-from utils.metadata_utils import parse_raw_details, enrich_raw_df_with_details
-from config.file_configs import PARSE_RAW_DETAILS_CONFIG
+from utils.metadata_utils import parse_raw_details,parse_staging_pathname ,enrich_raw_df_with_details
+from configs import PARSE_RAW_DETAILS_CONFIG
 from src.extract_data import extract_raw_to_stage
 import pandas as pd
 
@@ -34,16 +34,16 @@ def make_csv(make_dirs:dict[str,Path], input_filename:str):
 @pytest.mark.parametrize(
     "input_filename,output",
     [
-        ("Applebead.28-02-2023 breakdown.csv",{"fund":"Applebead", "date_time_partition":"2023-02-28"}),
-        ("Belaware.30_06_2023.csv",{"fund":"Belaware", "date_time_partition":"2023-06-30"}),
-        ("Fund Whitestone.31-08-2022 - details.csv",{"fund":"Whitestone", "date_time_partition":"2022-08-31"}),
-        ("Leeder.04_30_2023.csv",{"fund":"Leeder", "date_time_partition":"2023-04-30"}),
-        ("mend-report Wallington.28_02_2023.csv",{"fund":"Wallington", "date_time_partition":"2023-02-28"}),
-        ("TT_monthly_Trustmind.20230831.csv",{"fund":"Trustmind","date_time_partition":"2023-08-31"}),
-        ("Virtous.11-30-2022 - securities.csv",{"fund":"Virtous","date_time_partition":"2022-11-30"}),
-        ("Report-of-Gohen.04-30-2023.csv",{"fund":"Gohen" ,"date_time_partition":"2023-04-30"}),
-        ("Magnum.31-08-2023.csv",{"fund":"Magnum", "date_time_partition":"2023-08-31"}),
-        ("gohen 31-08-2023.csv",{"fund":"Gohen", "date_time_partition":"2023-08-31"})
+        ("Applebead.28-02-2023 breakdown.csv",{"fund":"APPLEBEAD", "date_time_partition":"2023-02-28"}),
+        ("Belaware.30_06_2023.csv",{"fund":"BELAWARE", "date_time_partition":"2023-06-30"}),
+        ("Fund Whitestone.31-08-2022 - details.csv",{"fund":"WHITESTONE", "date_time_partition":"2022-08-31"}),
+        ("Leeder.04_30_2023.csv",{"fund":"LEEDER", "date_time_partition":"2023-04-30"}),
+        ("mend-report Wallington.28_02_2023.csv",{"fund":"WALLINGTON", "date_time_partition":"2023-02-28"}),
+        ("TT_monthly_Trustmind.20230831.csv",{"fund":"TRUSTMIND","date_time_partition":"2023-08-31"}),
+        ("Virtous.11-30-2022 - securities.csv",{"fund":"VIRTOUS","date_time_partition":"2022-11-30"}),
+        ("Report-of-Gohen.04-30-2023.csv",{"fund":"GOHEN" ,"date_time_partition":"2023-04-30"}),
+        ("Magnum.31-08-2023.csv",{"fund":"MAGNUM", "date_time_partition":"2023-08-31"}),
+        ("gohen 31-08-2023.csv",{"fund":"GOHEN", "date_time_partition":"2023-08-31"})
      
     ]
 )
@@ -71,18 +71,18 @@ def test_extract_raw_to_stage(input_filename:str, output:dict[str,str],tmp_path:
 @pytest.mark.parametrize(
     "input_filename,output",
     [
-        ("Applebead.28-02-2023 breakdown.csv",{"fund_name":"Applebead", "date_time":"28-02-2023"}),
-        ("Belaware.30_06_2023.csv",{"fund_name":"Belaware", "date_time":"30_06_2023"}),
-        ("Fund Whitestone.31-08-2022 - details.csv",{"fund_name":"Whitestone", "date_time":"31-08-2022"}),
-        ("Leeder.04_30_2023.csv",{"fund_name":"Leeder", "date_time":"04_30_2023"}),
-        ("mend-report Wallington.28_02_2023.csv",{"fund_name":"Wallington", "date_time":"28_02_2023"}),
-        ("TT_monthly_Trustmind.20230831.csv",{"fund_name":"Trustmind","date_time":"20230831"}),
-        ("Virtous.11-30-2022 - securities.csv",{"fund_name":"Virtous","date_time":"11-30-2022"}),
-        ("Report-of-Gohen.04-30-2023.csv",{"fund_name":"Gohen" ,"date_time":"04-30-2023"}),
-        ("Magnum.31-08-2023.csv",{"fund_name":"Magnum", "date_time":"31-08-2023"}),
+        ("Applebead.28-02-2023 breakdown.csv",{"fund_name":"APPLEBEAD", "date_time":"28-02-2023"}),
+        ("Belaware.30_06_2023.csv",{"fund_name":"BELAWARE", "date_time":"30_06_2023"}),
+        ("Fund Whitestone.31-08-2022 - details.csv",{"fund_name":"WHITESTONE", "date_time":"31-08-2022"}),
+        ("Leeder.04_30_2023.csv",{"fund_name":"LEEDER", "date_time":"04_30_2023"}),
+        ("mend-report Wallington.28_02_2023.csv",{"fund_name":"WALLINGTON", "date_time":"28_02_2023"}),
+        ("TT_monthly_Trustmind.20230831.csv",{"fund_name":"TRUSTMIND","date_time":"20230831"}),
+        ("Virtous.11-30-2022 - securities.csv",{"fund_name":"VIRTOUS","date_time":"11-30-2022"}),
+        ("Report-of-Gohen.04-30-2023.csv",{"fund_name":"GOHEN" ,"date_time":"04-30-2023"}),
+        ("Magnum.31-08-2023.csv",{"fund_name":"MAGNUM", "date_time":"31-08-2023"}),
         ("somegiberrish 31-08-2023.csv",{"fund_name":None, "date_time":"31-08-2023"}),
-        ("gohen 31-08-2023.csv",{"fund_name":"gohen", "date_time":"31-08-2023"}),
-        ("TT_monthly_Trustmind.202301.csv",{"fund_name":"Trustmind","date_time":None})
+        ("gohen 31-08-2023.csv",{"fund_name":"GOHEN", "date_time":"31-08-2023"}),
+        ("TT_monthly_Trustmind.202301.csv",{"fund_name":"TRUSTMIND","date_time":None})
      
     ]
 )
@@ -102,7 +102,8 @@ def test_parse_raw_details(input_filename:str, output:dict[str,str|None]):
         ("Virtous", "11-30-2022", ["Virtous", "11-30-2022"]),
         ("Gohen", "04-30-2023", ["Gohen", "04-30-2023"]),
         ("Magnum", "31-08-2023", ["Magnum", "31-08-2023"]),
-        ("otherfundname", "30-09-1990", ["Otherfundname", "30-09-1990"])
+        ("otherfundname", "30-09-1990", ["otherfundname", "30-09-1990"]),
+        ("OTHERFUNDNAME", "30-09-1990", ["OTHERFUNDNAME", "30-09-1990"]),
     ]
 
 )

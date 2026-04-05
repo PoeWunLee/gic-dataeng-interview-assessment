@@ -2,11 +2,14 @@ from pathlib import Path
 import pandas as pd
 from typing import Generator
 import os
+import logging
 
 ##Generic##
-def get_files(dir:Path, ext:str)->Generator:
+def get_files(dir:Path, ext:str, filter_files:set[str]|list[str]|None=None)->list[Path]:
     "Retrieve all files of a particular extension in a directory path recursively"
-    return dir.rglob(ext)
+    if filter_files:
+        return [f for f in dir.rglob(ext) if f.name in set(filter_files)]
+    return [f for f in dir.rglob(ext)]
 
 def generate_dir(filepath:Path) -> None:
     """Generate directory if does not exist. If exists, exception not raised"""

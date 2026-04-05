@@ -10,7 +10,7 @@ from src.analytics import analyse_data
 
 from utils.file_utils import get_files, get_paths
 from utils.configs_utils import Configs, InitialiseConfigs, ExtractConfigs, LoadConfigs, AnalyseConfigs
-from utils.metadata_utils import parse_datetime_format
+from utils.metadata_utils import parse_datetime_format, filter_dates_to_load, filter_funds_to_load
 from dataclasses import dataclass
 
 @dataclass
@@ -61,29 +61,41 @@ class PipelineRun:
 
         return extracted_count
 
-    def load(self, target_date:str|list[str]|None=None):
+    def load(self, target_date:str|list[str]|None=None, target_fund:str|list[str]|None=None):
         """Load step - from staging directory -> sqlite. Assumption - input target_date comes in either list of strings, stings or None"""
         logging.info("STARTED: [LOAD]")
 
-        #initialised loaded_count
+        #initialised variables
         loaded_count=0
-        search_dir = [self.paths.get("staging")] #convert to string for coherence of for loop in the later portions
+
+        file_ext = self.load_configs.staging_filename_ext
+        eligible_fundnames = self.extract_configs.parse_raw_details_config.get("fund_name") #eligible fundnames
+        staging_path = self.paths.get("staging")
+
+        #placeholder - default values if no date or fund filters specified
+        search_dir = [self.paths.get("staging")] #placeholder variable. default if no date is chosen.
+        search_fund = None #placeholder variable. default if no date is chosen.
+        staged_files_to_load = []
 
         try:
+            #date filter
             if target_date:
-                if isinstance(target_date, str):
-                    target_date_formatted = parse_datetime_format(target_date) #clean possible datetime formats
-                    search_dir = [self.paths.get("staging")/target_date_formatted]
-                elif isinstance(target_date, list):
-                    search_dir = [self.paths.get("staging")/parse_datetime_format(td) for td in target_date] #clean possible datetime formats
+                search_dir = filter_dates_to_load(target_date=target_date, staging_path=staging_path)
 
+            #fund filter
+            if target_fund:
+                search_fund = filter_funds_to_load(target_fund=target_fund, eligible_fundnames=eligible_fundnames, file_ext=file_ext)
+                if len(search_fund)==0:
+                    return loaded_count
+            
             for sd in search_dir:
-                staged_files = get_files(dir=sd, ext=self.load_configs.staging_filename_ext)
-                logging.info("Loading into DB from directory: {}".format(sd))
-                loaded_count += load_funds(self.load_configs.cnxn_str,
-                                        staged_files, 
-                                        self.load_configs.fund_table_name
-                                        )
+                staged_files_to_load += get_files(dir=sd, ext=file_ext, filter_files=search_fund)
+            
+            logging.info("Loading into DB from directory: {}/{}".format(staged_files_to_load, staged_files_to_load))
+            loaded_count += load_funds(self.load_configs.cnxn_str,
+                                    staged_files_to_load, 
+                                    self.load_configs.fund_table_name
+                            )
         except Exception as e:
             logging.exception("Failed to load. {}".format(e))
             return loaded_count
@@ -108,14 +120,14 @@ class PipelineRun:
 
         return analysis_count
 
-    def run(self, target_date:str|None=None):
+    def run(self, target_date:str|list[str]|None=None, target_fund:str|list[str]|None=None):
         #initialise pipeline status
         status=PipelineStatus()
         if self.is_init:
             self.initialise()
 
         extract_status = self.extract()
-        loaded_status = self.load(target_date)
+        loaded_status = self.load(target_date, target_fund)
         analyse_status = self.analyse()
 
         logging.info("Extracted:{} files Loaded:{} rows Analysis outputs:{} files".format(extract_status, loaded_status, analyse_status))

@@ -3,10 +3,11 @@ from typing import Generator
 import logging
 from utils.file_utils import extract_csv_to_df
 from utils.db_utils import insert_df_to_db, init_db_connect
+from pathlib import Path
 
 logging.getLogger(__name__)
 
-def load_funds(cnxn_str:str,files:Generator, destination_table:str)->int|None:
+def load_funds(cnxn_str:str,files:list[Path], destination_table:str)->int|None:
     """Load raw CSV into funds table within the same date path"""
     try:
         #1. load respective csvs into dfs. compile all staged into single df
