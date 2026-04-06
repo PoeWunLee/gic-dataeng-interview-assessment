@@ -45,6 +45,21 @@ def df_from_sql_results(results:list[tuple]|None, cols:list[str]) -> pd.DataFram
     results_as_df = pd.DataFrame(results, columns=cols)
     return results_as_df
 
+def insert_sql_statement_from_df(df:pd.DataFrame, conn:Connection, destination_table:str)-> None:
+    sql_statements = []
+    update_statements = ['"{}"={}."{}"'.format(col,destination_table,col) for col in df.columns if col not in ("FUND", "DATETIME", "SYMBOL")]
+    column_statements = ",".join(['"{}"'.format(col) for col in df.columns])
+    df_formatted = df.copy().fillna(0)
+    for i, row in df_formatted.iterrows():
+        sql_statement = f"{str(tuple(row.values))}"
+        sql_statements.append(sql_statement)
+    
+    consol_sql_statement = f"""INSERT INTO {destination_table} ({column_statements}) VALUES {str(",".join(sql_statements))} ON CONFLICT(FUND, DATETIME, SYMBOL) DO UPDATE SET {" , ".join(update_statements)};"""
+    logging.info(consol_sql_statement)
+    with conn as cnxn:
+        execute_sql_to_db(consol_sql_statement,cnxn,is_bulk_ingest=True)
+    return
+
 def insert_df_to_db(df:pd.DataFrame, conn:Connection, destination_table:str)->None:
     """Insert data from pandas dataframe to database table"""
     df.to_sql(destination_table,conn, if_exists="append", index=False)
