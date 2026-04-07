@@ -7,7 +7,8 @@ from utils.metadata_utils import parse_raw_details,enrich_raw_df_with_details, p
 
 def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_config:dict[str,str])->None:
     """Extract raw CSV with metadata enrichment, then save to staging directory"""
-    files_processed=0 #keep track of files processed
+    files_processed = [] #keep track of files processed
+    files_unprocessed = []
     for f in files:
         try:
             #1. extract csv to dataframe
@@ -28,12 +29,17 @@ def extract_raw_to_stage(files:Generator, dest_root_path:Path, raw_details_confi
             save_df_to_csv(enriched_df, staged_file_name)
 
             #6. update processed count
-            files_processed +=1
+            files_processed.append(f)
 
         except Exception:
-            logging.exception(f"Failed to extract {f}. {files_processed} Processed", exc_info=True)
-            raise
+            logging.exception(f"Failed to extract {f}.", exc_info=True)
+            files_unprocessed.append(f)
 
-    logging.info(f"Extracted {files_processed} files to staging directory.")
+    files_processed_count = len(files_processed)
+    files_unprocessed_count = len(files_unprocessed)
+    logging.info(f"Extracted {files_processed_count}/{files_processed_count+files_unprocessed_count} files to staging directory.")
+    if files_unprocessed_count:
+        logging.info(f"{files_unprocessed_count} unextracted files.")
+        logging.info(f"{files_unprocessed}")
     
-    return
+    return files_processed, files_unprocessed

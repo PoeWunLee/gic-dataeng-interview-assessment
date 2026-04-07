@@ -56,6 +56,7 @@ def extract(path:dict[str,Path]):
     logging.info("STARTED: [EXTRACT]")
     raw_files = get_files(dir=path["raw"], ext=RAW_FILENAME_EXT)
     extract_raw_to_stage(raw_files, path["staging"], PARSE_RAW_DETAILS_CONFIG)
+
     logging.info("COMPLETED: [EXTRACT]\n")
 
 def load(path:dict[str,Path]):

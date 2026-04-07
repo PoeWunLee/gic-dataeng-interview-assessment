@@ -31,6 +31,21 @@ def make_csv(make_dirs:dict[str,Path], input_filename:str):
     
     return raw_csv
 
+@pytest.fixture
+def make_csv_list(make_dirs:dict[str,Path], input_filename:list[str]):
+    """Fixture to create raw csv file"""
+    raw_csv_lst = []
+    for files in input_filename:
+        raw_csv = make_dirs["raw"] / files
+        with open(raw_csv, 'w') as r:
+            r.write(
+            """FINANCIAL TYPE,SYMBOL,SECURITY NAME,SEDOL,PRICE,QUANTITY,REALISED P/L,MARKET VALUE\n
+            Equities,TJX,TJX Companies,,75.98,37468.4207623162,14761.023496753585,2846850.609520785"""
+            )
+        raw_csv_lst.append(raw_csv)
+    
+    return raw_csv_lst
+
 @pytest.mark.parametrize(
     "input_filename,output",
     [
@@ -120,3 +135,45 @@ def test_enrich_raw_df_with_details(input_fundname:str, input_date:str, output_r
     #assert - metadata correctly populated
     assert [results_fund, results_date]==output_results
 
+@pytest.mark.parametrize(
+    "input_filename,output_expected_dir,output_staged_file_unprocessed,output_staged_file_processed",
+    [
+        (["JibberishFund.28-02-2023 breakdown.csv"],"2023-02-28",["JibberishFund.28-02-2023 breakdown.csv"], []), #invalid fundname
+        (["Applebead.28-02-2023 breakdown.csv"],"2023-02-28",[],["Applebead.28-02-2023 breakdown.csv"]), #legitimate filename
+        (["Applebead.2800-1000-2023 breakdown.csv"],"",["Applebead.2800-1000-2023 breakdown.csv"],[]), #invalid date
+        (["Applebead.2800-1000-2023 breakdown.csv","mend-report Wallington.28_02_2023.csv"],"2023-02-28",["Applebead.2800-1000-2023 breakdown.csv"],["mend-report Wallington.28_02_2023.csv"]), #invalid date and valid file
+        (["JibberishFund.28-02-2023 breakdown.csv","mend-report Wallington.28_02_2023.csv"],"2023-02-28",["JibberishFund.28-02-2023 breakdown.csv"],["mend-report Wallington.28_02_2023.csv"]), #invalid filename and valid file
+        (["Applebead.28-02-2023 breakdown.csv","mend-report Wallington.28_02_2023.csv"],"2023-02-28",[],["Applebead.28-02-2023 breakdown.csv","mend-report Wallington.28_02_2023.csv"]), #>1 file legit
+        (["Applebeard.28-02-2023 breakdown.csv","mend-report Walllington.28_02_2023.csv"],"2023-02-28",["Applebeard.28-02-2023 breakdown.csv","mend-report Walllington.28_02_2023.csv"],[]) #>1 file not legit
+    ]
+)
+def test_skipping_bad_files(input_filename:list[str], 
+                            output_expected_dir:str,
+                            output_staged_file_unprocessed:list[str],
+                            output_staged_file_processed:list[str],
+                            tmp_path:Path, 
+                            make_dirs, 
+                            make_csv_list
+):
+    #arrange for tmp dir
+    csv_paths = make_csv_list
+    root_path = make_dirs
+    staging_root_path = root_path["staging"]
+
+    #act
+    staged_files_paths, unstaged_files_paths=extract_raw_to_stage(csv_paths, staging_root_path, PARSE_RAW_DETAILS_CONFIG)
+
+    staged_files = [sf.name for sf in staged_files_paths]
+    unstaged_files = [sf.name for sf in unstaged_files_paths]
+
+    #assert staging path is generated correctly
+    assert sorted(staged_files) == sorted(output_staged_file_processed) 
+    assert sorted(unstaged_files) == sorted(output_staged_file_unprocessed)
+
+    #assert staged dir and files exists and is created as part of extract function
+    assert all([sf.exists() for sf in staged_files_paths])
+
+
+    
+    
+    

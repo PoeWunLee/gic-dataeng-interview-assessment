@@ -25,7 +25,7 @@ def parse_datetime_format(date_time_raw:str)->pd.Series|None:
     """Further parsing datetime utility"""
     date_time_cleaned = date_time_raw.replace("_", "-")
     try:
-        date_time_converted = pd.to_datetime(date_time_cleaned, format="mixed") #account for variety of datetime formats4
+        date_time_converted = pd.to_datetime(date_time_cleaned, format="mixed") #account for variety of datetime formats
         date_time_str = date_time_converted.strftime('%Y-%m-%d')
         return date_time_str
     except:
@@ -43,4 +43,5 @@ def enrich_raw_df_with_details(df:pd.DataFrame, fund_name:str, date_time:str)->p
     enriched_df = df.copy()
     enriched_df['FUND'] = fund_name.capitalize()
     enriched_df['DATETIME'] = date_time
+
     return enriched_df
