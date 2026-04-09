@@ -6,8 +6,9 @@ from utils.file_utils import save_df_to_csv, extract_sql_from_file
 import logging
 logging.getLogger(__name__)
 
-def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path)->None:
+def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Path, export_root_dir:Path,funds:list[str]|None, dates:list[str]|None)->list[str]|None:
     """Generated analysis from SQL query and export to CSV"""
+    analysis_executed = []
     for analysis, in_out_map in config_dict.items():
         for sql_file, csv_export_file in in_out_map.items():
             try:
@@ -25,13 +26,22 @@ def analyse_data(cnxn_str:str, config_dict:dict[str,dict[str]], sql_root_dir:Pat
                 #4. save to df
                 results_df = df_from_sql_results(results, cols)
 
+                if funds:
+                    results_df = results_df.loc[results_df["FUND"].isin(funds)]
+                if dates:
+                    results_df = results_df.loc[results_df["DATETIME"].isin(dates)]
+
                 #5. save to csv
                 save_df_to_csv(results_df,csv_export_filepath)
+
+                analysis_executed.append(csv_export_filepath)
                 
             except Exception:
                 logging.exception(f"Analysis {analysis} failed to complete.", exc_info=True)
                 raise
+            
+
 
         logging.info(f"{analysis} analysis completed. Exported results to {list(in_out_map.values())}.")
     
-    return
+    return analysis_executed

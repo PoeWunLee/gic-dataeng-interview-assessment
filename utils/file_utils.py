@@ -31,3 +31,21 @@ def extract_sql_from_file(filepath:Path)->str:
     with open(filepath, 'r', encoding="utf-8") as sqlfile:
         sql_statement = sqlfile.read()
     return sql_statement
+
+#parsing paths
+def get_paths(root:Path)->dict[str,Path]:
+    """Parse all paths in a dictionary to be passed into each pipeline step"""
+    directories = {
+        "root":root,
+        "raw":root / "data" / "raw",
+        "staging":root / "data" / "staging",
+        "sql":root / "sql",
+        "analytics":root / "data" / "analytics",
+        "config":root / "config"
+    }
+
+    #initialise directories if doesn't exist
+    for d in directories.values():
+        generate_dir(d)
+    
+    return directories
